@@ -1,5 +1,7 @@
 # KaspbeeryPi
-Mostly just to note down to my future self wtf I did back then to get it spinning! Use what you can, currently incomplete and untested. App is live for demo though, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
+So the micro SD card in my Raspberry Pi Zero W burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens.
+
+Use what you can, currently incomplete and untested. App is live for demo though, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
 Designed for the RaspberryPi Zero W. Logs to Dropbox. 
 
 ## Installation
