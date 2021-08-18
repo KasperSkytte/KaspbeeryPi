@@ -1,5 +1,6 @@
 # KaspbeeryPi
-Designed for the RaspberryPi Zero W. Logs to Dropbox.
+Mostly just to note down to my future self wtf I did back then to get it spinning! Use what you can, currently incomplete and untested. App is live for demo though, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
+Designed for the RaspberryPi Zero W. Logs to Dropbox. 
 
 ## Installation
 ### Dropbox app
