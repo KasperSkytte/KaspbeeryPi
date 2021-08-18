@@ -22,22 +22,25 @@ sudo systemctl restart docker
 Run the Shiny app by either hosting it on (https://shinyapps.io)[https://shinyapps.io], run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
 
 ## How to run
-First build the docker container with `docker build -t kaspbeerypi`, then start the container and start logging with:
+Optionally build the docker container image first with `docker build -t kasperskytte/kaspbeerypi:latest .`, otherwise pull and start the container and start logging fermentation with:
 ```
 docker run \
   -it \
-  --rm \
   --name readsensors \
   --privileged \
+  --restart unless-stopped \
   -e dropbox_token="pasteyourdropboxtokenhere" \
   -e dropbox_folder="data" \
   -e tiltID="a495bb30c5b14b44b5121370f02d74de" \
   -e read_interval=5 \
-  kaspbeerypi
+  kasperskytte/kaspbeerypi:latest
 ```
 
-A few options as well as the dropbox token are set using the following environment variables:
+Setting the restart policy to `unless-stopped` makes it automatically start logging with every boot, which is handy when running in headless mode.
+A few options as well as the dropbox token are set using the following environment variables (adjust with `-e key=value`):
 | dropbox_token | The Dropbox token to the Dropbox app |
 | dropbox_folder | Subfolder inside the Dropbox app folder where data will be stored |
 | tiltID | ID of the Tilt hydrometer, default is the black version |
 | read_interval | Time in minutes between reading sensors and tilt |
+
+By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
