@@ -1,1 +1,42 @@
-KaspbeeryPi
+# KaspbeeryPi
+Designed for the RaspberryPi Zero W. Logs to Dropbox.
+
+## Installation
+### Dropbox app
+Head to (DBX Platform)[https://www.dropbox.com/developers] to create a Dropbox app where the data will be saved. Note down the token and secret.
+
+### Logging on the Raspberry Pi Zero W
+ - Enable 1-wire interface either from `raspi-config` or by adding a line with `dtoverlay=w1-gpio` to `/boot/config.txt`.
+ - Install Docker with `sudo curl -sL get.docker.com | bash`.
+
+The Docker installation will likely error as the CPU on the Pi Zero W is old and requires an older version of `containerd` to be supported. In that case downgrade containerd by running the following:
+```
+wget https://packagecloud.io/Hypriot/rpi/packages/raspbian/buster/containerd.io_1.2.6-1_armhf.deb/download.deb
+sudo dpkg -i download.deb
+sudo rm download.deb
+sudo systemctl restart docker
+```
+
+### Running the Shiny app for displaying the logged data
+Run the Shiny app by either hosting it on (https://shinyapps.io)[https://shinyapps.io], run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
+
+## How to run
+First build the docker container with `docker build -t kaspbeerypi`, then start the container and start logging with:
+```
+docker run \
+  -it \
+  --rm \
+  --name readsensors \
+  --privileged \
+  -e dropbox_token="pasteyourdropboxtokenhere" \
+  -e dropbox_folder="data" \
+  -e tiltID="a495bb30c5b14b44b5121370f02d74de" \
+  -e read_interval=5 \
+  kaspbeerypi
+```
+
+A few options as well as the dropbox token are set using the following environment variables:
+| dropbox_token | The Dropbox token to the Dropbox app |
+| dropbox_folder | Subfolder inside the Dropbox app folder where data will be stored |
+| tiltID | ID of the Tilt hydrometer, default is the black version |
+| read_interval | Time in minutes between reading sensors and tilt |
