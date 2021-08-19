@@ -83,4 +83,6 @@ A few options as well as the dropbox token are set using the following environme
 By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
 
 # To-do
-Data format has changed, the Shiny app cannot load it at the moment. Need to adjust to new format, right now it's expecting only one file.
+ - Data format has changed, the Shiny app cannot load it at the moment. Need to adjust to new format, right now it's expecting only one file.
+ - Implement relay for controlling kegerator
+ - Display example console output in readme + picture of setup
