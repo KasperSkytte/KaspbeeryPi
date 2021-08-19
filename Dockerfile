@@ -41,5 +41,6 @@ COPY blescan.py readsensors.py scrollit.py ./
 
 VOLUME /data
 WORKDIR /data
-
+RUN apt-get -y install tzdata
+ENV TZ="Europe/Copenhagen"
 ENTRYPOINT ["python", "/kaspbeerypi/readsensors.py"]
