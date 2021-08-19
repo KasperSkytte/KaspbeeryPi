@@ -1,15 +1,17 @@
 # KaspbeeryPi
-Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the (Tilt hydrometer)[https://tilthydrometer.com/] through Bluetooth. Data is uploaded to dropbox with every reading (default every 5 minutes), where a Shiny app can then grab it for plotty plots.
+Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the [Tilt hydrometer](https://tilthydrometer.com/) through Bluetooth. Data is uploaded to dropbox with every reading (default every 5 minutes), where a Shiny app can then grab it for plotty plots.
 
-The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can. Shiny app is live for demo, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
+The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can, this repo is mainly for my future self to note down wtf I did back then!
+
+Shiny app is live for demo, see [https://kasperskytte.shinyapps.io/KaspbeeryPi/](https://kasperskytte.shinyapps.io/KaspbeeryPi/).
 
 ## Installation
 ### Dropbox app
-Head to (DBX Platform)[https://www.dropbox.com/developers] to create a Dropbox app where the data will be saved. Note down the token and secret.
+Head to [DBX Platform](https://www.dropbox.com/developers) to create a Dropbox app where the data will be saved. Note down the token and secret.
 
 ### Logging on the Raspberry Pi Zero W
  - Enable 1-wire interface either from `raspi-config` or by adding a line with `dtoverlay=w1-gpio` to `/boot/config.txt`.
- - Install Docker with `sudo curl -sL get.docker.com | bash` and preferably also (docker-compose)[https://docs.docker.com/compose/install/].
+ - Install Docker with `sudo curl -sL get.docker.com | bash` and preferably also [docker-compose](https://docs.docker.com/compose/install/).
 
 The Docker installation will likely error as the CPU on the Pi Zero W is old and requires an older version of `containerd` to be supported. In that case downgrade containerd by running the following:
 ```
@@ -20,9 +22,9 @@ sudo systemctl restart docker
 ```
 
 ### Running the Shiny app for displaying the logged data
-Run the Shiny app by either hosting it on (https://shinyapps.io)[https://shinyapps.io], run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
+Run the Shiny app by either hosting it on [https://shinyapps.io](https://shinyapps.io), run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
 
-### Scroll text on the (Scroll pHAT HD)[https://learn.pimoroni.com/scroll-phat-hd] from Pimoroni
+### Scroll text on the [Scroll pHAT HD](https://learn.pimoroni.com/scroll-phat-hd) from Pimoroni
  - Enable I2C interface through `raspi-config`
  - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
 
