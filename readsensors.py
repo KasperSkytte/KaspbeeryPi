@@ -23,7 +23,7 @@ readings = []
 def readsensors():
   #timestamp when reading sensors
   time = datetime.now().strftime("%Y-%b-%d %H:%M")
-  print(time)
+  print(" *** " + time + " ***")
 
   #read tilt
   try:
@@ -52,13 +52,15 @@ def readsensors():
     readings.append([str(time), "tiltSG", str(tiltSG)])
     readings.append([str(time), "tiltTempC", str(tiltTempC)])
 
-
   #read 1-wire thermometers
   for sensor in W1ThermSensor.get_available_sensors():
     id = "Probe"+str(sensor.id)[0:2]
     temp = str(round(sensor.get_temperature(), 3))
     print(id+": "+temp)
     readings.append([str(time), id, temp])
+
+  #tidy console output in blocks for each timestamp
+  print("\n")
 
   #write to local file
   with open(filepath, "a") as file:
