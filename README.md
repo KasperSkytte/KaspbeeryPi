@@ -1,8 +1,7 @@
 # KaspbeeryPi
-So the micro SD card in my Raspberry Pi Zero W burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens.
+Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the (Tilt hydrometer)[https://tilthydrometer.com/] through Bluetooth. Data is uploaded to dropbox with every reading (default every 5 minutes), where a Shiny app can then grab it for plotty plots.
 
-Use what you can, currently incomplete and untested. App is live for demo though, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
-Designed for the RaspberryPi Zero W. Logs to Dropbox. 
+The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can. Shiny app is live for demo, see (https://kasperskytte.shinyapps.io/KaspbeeryPi/)[https://kasperskytte.shinyapps.io/KaspbeeryPi/].
 
 ## Installation
 ### Dropbox app
@@ -10,7 +9,7 @@ Head to (DBX Platform)[https://www.dropbox.com/developers] to create a Dropbox a
 
 ### Logging on the Raspberry Pi Zero W
  - Enable 1-wire interface either from `raspi-config` or by adding a line with `dtoverlay=w1-gpio` to `/boot/config.txt`.
- - Install Docker with `sudo curl -sL get.docker.com | bash`.
+ - Install Docker with `sudo curl -sL get.docker.com | bash` and preferably also (docker-compose)[https://docs.docker.com/compose/install/].
 
 The Docker installation will likely error as the CPU on the Pi Zero W is old and requires an older version of `containerd` to be supported. In that case downgrade containerd by running the following:
 ```
