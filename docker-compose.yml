@@ -1,0 +1,17 @@
+---
+version: "3.5"
+services:
+  kaspbeerypi:
+    image: kasperskytte/kaspbeerypi:latest
+    container_name: kaspbeerypi
+    environment:
+      - TZ="Europe/Copenhagen"
+      - dropbox_token="pasteyourdropboxtokenhere"
+      - dropbox_folder="data" \
+      - tilt_id="a495bb30c5b14b44b5121370f02d74de"
+      - tilt_sg_adjust=0
+      - read_interval=5
+    devices:
+      - /dev/i2c-1
+    network_mode: "host"
+    restart: unless-stopped

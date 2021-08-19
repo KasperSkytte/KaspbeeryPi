@@ -12,6 +12,7 @@ from datetime import datetime
 
 #get options from system environment variables
 tilt_id = str(os.environ.get("tilt_id"))
+tilt_sg_adjust = int(os.environ.get("tilt_sg_adjust"))
 read_interval = int(os.environ.get("read_interval"))
 dropbox_token = str(os.environ.get("dropbox_token"))
 dropbox_folder = str(os.environ.get("dropbox_folder"))
@@ -39,7 +40,7 @@ def readsensors():
           if output[1] == tilt_id: #Change this to the colour of you tilt
             tempf = float(output[2]) #convert the string for the temperature to a float type
             gotData = 1
-            tiltSG = int(output[3])
+            tiltSG = int(output[3])+tilt_sg_adjust
             tiltTempC = round((tempf-32)/1.8, 3)
       blescan.hci_disable_le_scan(sock)
       print("Tilt temp: "+str(tiltTempC)+"\nTilt SG: "+str(tiltSG))
@@ -60,8 +61,8 @@ def readsensors():
     readings.append([str(time), id, temp])
 
   #tidy console output in blocks for each timestamp
-  print("\n")
-
+  print("-------------------------\n")
+ 
   #write to local file
   with open(filepath, "a") as file:
     writer = csv.writer(file, quoting=csv.QUOTE_ALL)
