@@ -34,6 +34,7 @@ docker run \
   -e dropbox_token="pasteyourdropboxtokenhere" \
   -e dropbox_folder="data" \
   -e tilt_id="a495bb30c5b14b44b5121370f02d74de" \
+  -e tilt_sg_adjust=0 \
   -e read_interval=5 \
   kasperskytte/kaspbeerypi:latest
 ```
@@ -46,6 +47,7 @@ A few options as well as the dropbox token are set using the following environme
 | dropbox_token | The Dropbox token to the Dropbox app |
 | dropbox_folder | Subfolder inside the Dropbox app folder where data will be stored |
 | tilt_id | ID of the Tilt hydrometer, default is the black version |
+| tilt_sg_adjust | Add an integer to the Tilt gravity reading for calibration. This is useful when changing the battery as its weight can be slightly different compared to the stock battery. |
 | read_interval | Time in minutes between reading sensors and tilt |
 
 By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
