@@ -25,12 +25,35 @@ Run the Shiny app by either hosting it on (https://shinyapps.io)[https://shinyap
 
 ### Scroll text pHAT HD from Pimoroni
  - Enable I2C interface through `raspi-config`
+ - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
 
 ## How to run
 Optionally build the docker container image first with `docker build -t kasperskytte/kaspbeerypi:latest .`, otherwise pull and start the container and start logging fermentation with:
+
+### docker-compose
+```
+---
+version: "3.5"
+services:
+  kaspbeerypi:
+    image: kasperskytte/kaspbeerypi:latest
+    container_name: kaspbeerypi
+    environment:
+      - TZ="Europe/Copenhagen"
+      - dropbox_token="pasteyourdropboxtokenhere"
+      - dropbox_folder="data" \
+      - tilt_id="a495bb30c5b14b44b5121370f02d74de"
+      - tilt_sg_adjust=0
+      - read_interval=5
+    devices:
+      - /dev/i2c-1
+    network_mode: "host"
+    restart: unless-stopped
+```
+
+### Docker CLI
 ```
 docker run \
-  -it \
   -d \
   --name readsensors \
   --net=host \
