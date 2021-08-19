@@ -22,7 +22,7 @@ sudo systemctl restart docker
 ### Running the Shiny app for displaying the logged data
 Run the Shiny app by either hosting it on (https://shinyapps.io)[https://shinyapps.io], run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
 
-### Scroll text pHAT HD from Pimoroni
+### Scroll text on the (Scroll pHAT HD)[https://learn.pimoroni.com/scroll-phat-hd] from Pimoroni
  - Enable I2C interface through `raspi-config`
  - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
 
