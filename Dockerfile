@@ -29,10 +29,13 @@ RUN apt-get update && \
     libbluetooth-dev
 
 RUN python -m pip install --upgrade pip && \
-  pip3 install pipenv==2021.5.29
-
-COPY Pipfile Pipfile.lock ./
-RUN pipenv install --python /usr/local/bin/python --deploy --system
+  pip3 install \
+    dropbox==11.16.0 \
+    interruptingcow==0.8 \
+    w1thermsensor==2.0.0 \
+    pybluez==0.23 \
+    scrollphathd==1.3.0 \
+    schedule==1.1.0
 
 COPY blescan.py readsensors.py scrollit.py ./
 
