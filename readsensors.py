@@ -9,13 +9,12 @@ from dropbox.files import WriteMode
 from interruptingcow import timeout
 from w1thermsensor import W1ThermSensor
 from datetime import datetime
-import json
 
 #get options from system environment variables
-tiltID = os.environ.get("tiltID")
-read_interval = os.environ.get("read_interval")
-dropbox_token = os.environ.get("dropbox_token")
-dropbox_folder = os.environ.get("dropbox_folder")
+tilt_id = str(os.environ.get("tilt_id"))
+read_interval = int(os.environ.get("read_interval"))
+dropbox_token = str(os.environ.get("dropbox_token"))
+dropbox_folder = str(os.environ.get("dropbox_folder"))
 
 #create a new filename with the current time as unique identifier
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
@@ -37,7 +36,7 @@ def readsensors():
         returnedList = blescan.parse_events(sock, 10)
         for beacon in returnedList: #returnedList is a list datatype of string datatypes seperated by commas (,)
           output = beacon.split(',') #split the list into individual strings in an array
-          if output[1] == tiltID: #Change this to the colour of you tilt
+          if output[1] == tilt_id: #Change this to the colour of you tilt
             tempf = float(output[2]) #convert the string for the temperature to a float type
             gotData = 1
             tiltSG = int(output[3])

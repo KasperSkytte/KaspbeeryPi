@@ -29,20 +29,23 @@ Optionally build the docker container image first with `docker build -t kaspersk
 docker run \
   -it \
   --name readsensors \
-  --privileged \
+  --net=host \
   --restart unless-stopped \
   -e dropbox_token="pasteyourdropboxtokenhere" \
   -e dropbox_folder="data" \
-  -e tiltID="a495bb30c5b14b44b5121370f02d74de" \
+  -e tilt_id="a495bb30c5b14b44b5121370f02d74de" \
   -e read_interval=5 \
   kasperskytte/kaspbeerypi:latest
 ```
 
 Setting the restart policy to `unless-stopped` makes it automatically start logging with every boot, which is handy when running in headless mode.
 A few options as well as the dropbox token are set using the following environment variables (adjust with `-e key=value`):
+
+| Variable | Description |
+| --- | --- |
 | dropbox_token | The Dropbox token to the Dropbox app |
 | dropbox_folder | Subfolder inside the Dropbox app folder where data will be stored |
-| tiltID | ID of the Tilt hydrometer, default is the black version |
+| tilt_id | ID of the Tilt hydrometer, default is the black version |
 | read_interval | Time in minutes between reading sensors and tilt |
 
 By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
