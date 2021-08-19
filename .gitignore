@@ -27,3 +27,4 @@ rsconnect/
 *.Rproj
 .Rproj.user
 renv/
+blescan.pyc
