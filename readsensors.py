@@ -76,8 +76,6 @@ def readsensors():
   except Exception as err:
     print("Failed to upload file to dropbox:\n%s" % err)
 
-#run immediately
-readsensors()
 # and then schedule to run with every chosen interval
 schedule.every(read_interval).minutes.do(readsensors)
 
