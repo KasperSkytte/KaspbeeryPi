@@ -7,7 +7,7 @@ Shiny app is live for demo, see [https://kasperskytte.shinyapps.io/KaspbeeryPi/]
 
 ## Installation
 ### Dropbox app
-Head to [DBX Platform](https://www.dropbox.com/developers) to create a Dropbox app where the data will be saved. Note down the token and secret.
+Head to [DBX Platform](https://www.dropbox.com/developers) to create a Dropbox app where the data will be saved. Note down the token and key+secret.
 
 ### Logging on the Raspberry Pi Zero W
  - Enable 1-wire interface either from `raspi-config` or by adding a line with `dtoverlay=w1-gpio` to `/boot/config.txt`.
@@ -34,21 +34,29 @@ Optionally build the docker container image first with `docker build -t kaspersk
 ### docker-compose
 ```
 ---
-version: "3.5"
+version: "3"
 services:
-  kaspbeerypi:
+  readsensors:
     image: kasperskytte/kaspbeerypi:latest
-    container_name: kaspbeerypi
+    container_name: readsensors
     environment:
-      - TZ="Europe/Copenhagen"
-      - dropbox_token="pasteyourdropboxtokenhere"
-      - dropbox_folder="data" \
-      - tilt_id="a495bb30c5b14b44b5121370f02d74de"
+      - TZ=Europe/Copenhagen
+      - dropbox_token=pasteyourtokenhere
+      - dropbox_folder=data
+      - tilt_id=a495bb30c5b14b44b5121370f02d74de
       - tilt_sg_adjust=0
       - read_interval=5
+    volumes:
+      - ${PWD}/data:/data
+    network_mode: "host"
+    restart: unless-stopped
+  scrollit:
+    image: kasperskytte/kaspbeerypi:latest
+    container_name: scrollit
+    network_mode: "host"
     devices:
       - /dev/i2c-1
-    network_mode: "host"
+    command: /kaspbeerypi/scrollit.py
     restart: unless-stopped
 ```
 
@@ -59,10 +67,11 @@ docker run \
   --name readsensors \
   --net=host \
   --restart unless-stopped \
-  -e TZ="Europe/Copenhagen" \
-  -e dropbox_token="pasteyourdropboxtokenhere" \
-  -e dropbox_folder="data" \
-  -e tilt_id="a495bb30c5b14b44b5121370f02d74de" \
+  -v ${PWD}/data:/data \
+  -e TZ=Europe/Copenhagen \
+  -e dropbox_token=pasteyourdropboxtokenhere \
+  -e dropbox_folder=data \
+  -e tilt_id=a495bb30c5b14b44b5121370f02d74de \
   -e tilt_sg_adjust=0 \
   -e read_interval=5 \
   kasperskytte/kaspbeerypi:latest
