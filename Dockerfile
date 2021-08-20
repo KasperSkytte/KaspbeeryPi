@@ -36,5 +36,5 @@ COPY blescan.py readsensors.py scrollit.py ./
 VOLUME /data
 WORKDIR /data
 
-ENTRYPOINT ["python", "/kaspbeerypi/scrollit.py"]
-ENTRYPOINT ["python", "/kaspbeerypi/readsensors.py"]
+ENTRYPOINT ["python"]
+CMD ["/kaspbeerypi/readsensors.py"]
