@@ -1,5 +1,4 @@
----
-version: "3"
+version: "2"
 services:
   readsensors:
     image: kasperskytte/kaspbeerypi:latest
@@ -21,5 +20,5 @@ services:
     network_mode: "host"
     devices:
       - /dev/i2c-1
-    command: /kaspbeerypi/scrollit.py
+    command: scrollit.py
     restart: unless-stopped
