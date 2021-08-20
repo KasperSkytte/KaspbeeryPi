@@ -5,7 +5,6 @@ import dropbox
 import sys
 import os
 import schedule
-import time
 from dropbox.files import WriteMode
 from interruptingcow import timeout
 from w1thermsensor import W1ThermSensor
@@ -20,9 +19,9 @@ dropbox_folder = str(os.environ.get("dropbox_folder"))
 
 #create a new filename with the current time as unique identifier
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
-readings = []
 
 def readsensors():
+  readings = []
   #timestamp when reading sensors
   time = datetime.now().strftime("%Y-%b-%d %H:%M")
   print(" *** " + time + " ***")
@@ -83,7 +82,6 @@ schedule.every(read_interval).minutes.do(readsensors)
 try:
   while True:
     schedule.run_pending()
-    time.sleep(1)
 except KeyboardInterrupt:
   print("Stopping by keyboard interrupt...")
   sys.exit(-1)
