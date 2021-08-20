@@ -2,5 +2,4 @@
 **
 
 #except
-!Pipfile*
 !*.py
