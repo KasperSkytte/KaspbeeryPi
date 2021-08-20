@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM arm32v5/python:3.7-slim-buster
 
 WORKDIR /kaspbeerypi
 
@@ -13,14 +13,16 @@ ENV tiltID=a495bb30c5b14b44b5121370f02d74de \
   LC_ALL=C.UTF-8 \
   PYTHONDONTWRITEBYTECODE=1 \
   PYTHONFAULTHANDLER=1 \
-  DEBIAN_FRONTEND=noninteractive
+  DEBIAN_FRONTEND=noninteractive \
+  PATH="/kaspbeerypi:${PATH}"
 
-RUN apt-get update && \
+RUN apt-get -qqy update && \
   apt-get -y install --no-install-recommends --no-install-suggests \
     gcc \
     python3-pip \
     bluez \
-    libbluetooth-dev
+    libbluetooth-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN python -m pip install --upgrade pip && \
   pip3 install \
@@ -36,5 +38,4 @@ COPY blescan.py readsensors.py scrollit.py ./
 VOLUME /data
 WORKDIR /data
 
-ENTRYPOINT ["python"]
-CMD ["/kaspbeerypi/readsensors.py"]
+CMD ["readsensors.py"]
