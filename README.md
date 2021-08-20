@@ -95,3 +95,8 @@ By default a volume named `/data` is used to store the data until restart/reboot
  - Data format has changed, the Shiny app cannot load it at the moment. Need to adjust to new format, right now it's expecting only one file.
  - Implement relay for controlling kegerator
  - Display example console output in readme + picture of setup
+
+# Notes to self
+ - The version of wpa_supplicant that comes with Raspbian Buster does not work with eduroam WiFi networks. Either [downgrade wpa_supplicant](https://medium.com/good-robot/connect-your-raspberry-pi-to-eduroam-special-instructions-for-raspbian-buster-dfd536003999) or install Raspbian Stretch, last image is available [here](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/).
+
+ - add "static domain_name_servers=1.1.1.1 1.0.0.1" to /etc/dhcpcd.conf when connecting from AAU network and connecting to VPN. The DNS servers retrieved from DHCP before VPN is established are unavailable outside AAU network.
