@@ -3,14 +3,14 @@ FROM python:3.7-slim-buster
 WORKDIR /kaspbeerypi
 
 #default options for readsensors.py
-ENV tiltID="a495bb30c5b14b44b5121370f02d74de" \
+ENV tiltID=a495bb30c5b14b44b5121370f02d74de \
   tilt_sg_adjust=0 \
-  dropbox_token="" \
+  dropbox_token= \
   read_interval=5 \
-  dropbox_folder="data" \
-  TZ="Europe/Copenhagen" \
-  LANG="C.UTF-8" \
-  LC_ALL="C.UTF-8" \
+  dropbox_folder=data \
+  TZ=Europe/Copenhagen \
+  LANG=C.UTF-8 \
+  LC_ALL=C.UTF-8 \
   PYTHONDONTWRITEBYTECODE=1 \
   PYTHONFAULTHANDLER=1 \
   DEBIAN_FRONTEND=noninteractive
