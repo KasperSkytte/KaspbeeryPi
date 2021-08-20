@@ -5,6 +5,7 @@ import dropbox
 import sys
 import os
 import schedule
+import time
 from dropbox.files import WriteMode
 from interruptingcow import timeout
 from w1thermsensor import W1ThermSensor
@@ -82,6 +83,7 @@ schedule.every(read_interval).minutes.do(readsensors)
 try:
   while True:
     schedule.run_pending()
+    time.sleep(1)
 except KeyboardInterrupt:
   print("Stopping by keyboard interrupt...")
   sys.exit(-1)
