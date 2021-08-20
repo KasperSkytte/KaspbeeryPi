@@ -15,7 +15,7 @@ Head to [DBX Platform](https://www.dropbox.com/developers) to create a Dropbox a
 
 The Docker installation will likely error as the CPU on the Pi Zero W is old and requires an older version of `containerd` to be supported. In that case downgrade containerd by running the following:
 ```
-wget https://packagecloud.io/Hypriot/rpi/packages/raspbian/buster/containerd.io_1.2.6-1_armhf.deb/download.deb
+wget https://packagecloud.io/Hypriot/rpi/packages/raspbian/$(lsb_release -cs)/containerd.io_1.2.6-1_armhf.deb/download.deb
 sudo dpkg -i download.deb
 sudo rm download.deb
 sudo systemctl restart docker
