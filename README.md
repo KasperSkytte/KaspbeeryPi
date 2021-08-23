@@ -24,6 +24,8 @@ sudo systemctl restart docker
 ### Running the Shiny app for displaying the logged data
 Run the Shiny app by either hosting it on [https://shinyapps.io](https://shinyapps.io), run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
 
+The app will synchronize with the chosen folder on Dropbox based on content hashes and store and load the data locally. This is faster than having to download everything with every launch, and all the logs from finished brews will likely never change again, only the most recent, and maybe still active, will. The file `names.csv` must be created and stored alongside all the individual logs files in the same folder. What's in this file is ultimately deciding what's shown in the app and is also where the brews can be named. See example: [/shiny/data/names.csv](https://github.com/KasperSkytte/kaspbeerypi/blob/main/shiny/data/names.csv).
+
 ### Scroll text on the [Scroll pHAT HD](https://learn.pimoroni.com/scroll-phat-hd) from Pimoroni
  - Enable I2C interface through `raspi-config`
  - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
@@ -92,7 +94,7 @@ A few options as well as the dropbox token are set using the following environme
 By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
 
 # To-do
- - Data format has changed, the Shiny app cannot load it at the moment. Need to adjust to new format, right now it's expecting only one file.
+ - Use Google Drive instead of Dropbox to be able to edit names.csv more easily from browser
  - Implement relay for controlling kegerator
  - Display example console output in readme + picture of setup
 

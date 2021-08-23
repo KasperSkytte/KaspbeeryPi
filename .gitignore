@@ -28,3 +28,4 @@ rsconnect/
 .Rproj.user
 renv/
 blescan.pyc
+shiny/token.rds
