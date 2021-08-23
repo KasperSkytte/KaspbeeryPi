@@ -103,7 +103,7 @@ shinyApp(
       }
       
       
-      #names.csv file on dropbox dominates and decides what to store locally
+      #names_file file on dropbox dominates and decides what to store locally
       if(any(grepl(paste0(names_filepath, "$"), drop_files_status$path_lower))) {
         drop_download(
           path = names_filepath,
@@ -112,9 +112,10 @@ shinyApp(
           progress = FALSE,
           verbose = FALSE
         )
-      }
+      } else
+        stop(paste("No file named", names_file, "found on Dropbox"), call. = FALSE)
       
-      #read names.csv and merge with db file list for checking content hashes
+      #read names_file and merge with db file list for checking content hashes
       names <- merge(
         fread(names_filepath),
         drop_files_status,
@@ -139,14 +140,14 @@ shinyApp(
       )
       local_data <- local_data[!grepl(paste0(names_file, "$"), local_data)]
       
-      #delete local files not mentioned in names.csv
+      #delete local files not mentioned in names_file
       file.remove(local_data[!basename(local_data) %chin% names_comb$filename])
       
       #download those that don't exist locally or with changed hash since last time
       #and load files into a list 
       datalist <- plyr::dlply(
         names_comb,
-        "name",
+        "filename",
         function(x) {
           if(!x$filename %chin% basename(local_data) | !identical(x$content_hash, x$content_hash_local)) {
             drop_download(
@@ -166,6 +167,8 @@ shinyApp(
           #sometimes observations get added with the same timestamp and sensor if the Pi hasn't adjusted its clock
           readings <- readings[!duplicated(readings[,c("time", "sensor")]),]
           
+          #set brew name as attribute to show in selection instead of file names
+          attr(readings, "brew") <- x$name
           return(readings)
         }
       )
@@ -173,14 +176,19 @@ shinyApp(
       #update local hash table
       fwrite(drop_files_status[,c("name", "content_hash")], file = "files_status.csv")
       
-      datalist <- datalist[names_comb$name]
-      
+      #order by names_file
+      datalist <- datalist[names_comb$filename]
+
       return(datalist)
     })
     
     output$brew <- renderUI({
       shiny::req(getData())
+      
+      #extract file names and brew names to choose between
       brews <- names(getData())
+      names(brews) <- sapply(getData(), attr, "brew")
+      
       selectInput(
         inputId = "brew",
         label = "Beer name",
@@ -267,7 +275,7 @@ shinyApp(
     })
     
     output$plot <- renderDygraph({
-      shiny::req(dataSubset(), input$sensor)
+      shiny::req(dataSubset(), input$sensor, brewData())
       plot <- dygraph(dataSubset()) %>%
         #dyRangeSelector(height = 100) %>%
         dyOptions(drawPoints = TRUE, pointSize = 2, drawGrid = FALSE) %>%
