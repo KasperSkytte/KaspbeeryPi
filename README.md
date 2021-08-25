@@ -97,6 +97,7 @@ By default a volume named `/data` is used to store the data until restart/reboot
  - Use Google Drive instead of Dropbox to be able to edit names.csv more easily from browser
  - Implement relay for controlling kegerator
  - Display example console output in readme + picture of setup
+ - Shiny app should save data to a tmp folder, not the app folder itself. Right have to do a chmod 777 for it to work, not ideal.
 
 # Notes to self
  - The version of wpa_supplicant that comes with Raspbian Buster does not work with eduroam WiFi networks. Either [downgrade wpa_supplicant](https://medium.com/good-robot/connect-your-raspberry-pi-to-eduroam-special-instructions-for-raspbian-buster-dfd536003999) or install Raspbian Stretch, last image is available [here](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/).
