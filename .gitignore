@@ -29,3 +29,5 @@ rsconnect/
 renv/
 blescan.pyc
 token.rds
+files_status.csv
+data/
