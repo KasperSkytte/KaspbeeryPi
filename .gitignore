@@ -31,3 +31,8 @@ blescan.pyc
 token.rds
 files_status.csv
 data/
+.Rdata
+.DS_Store
+inst/doc
+/doc/
+/Meta/

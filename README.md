@@ -1,3 +1,8 @@
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/kasperskytte/kaspbeerypi/workflows/R-CMD-check/badge.svg)](https://github.com/kasperskytte/kaspbeerypi/actions)
+<!-- badges: end -->
+
 # KaspbeeryPi
 Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the [Tilt hydrometer](https://tilthydrometer.com/) through Bluetooth. Data is uploaded to dropbox with every reading (default every 5 minutes), where a Shiny app can then grab it for plotty plots.
 
@@ -31,7 +36,7 @@ The app will synchronize with the chosen folder on Dropbox based on content hash
  - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
 
 ## How to run
-Optionally build the docker container image first with `docker build -t kasperskytte/kaspbeerypi:latest .`, otherwise pull and start the container and start logging fermentation with:
+Optionally build the docker container image first with `docker build -t kasperskytte/kaspbeerypi:latest logFermentation/`, otherwise pull and start the container and start logging fermentation with:
 
 ### docker-compose
 ```
@@ -97,7 +102,7 @@ By default a volume named `/data` is used to store the data until restart/reboot
  - Use Google Drive instead of Dropbox to be able to edit names.csv more easily from browser
  - Implement relay for controlling kegerator
  - Display example console output in readme + picture of setup
- - Shiny app should save data to a tmp folder, not the app folder itself. Right have to do a chmod 777 for it to work, not ideal.
+ - Shiny app should save data to a tmp folder, not the app folder itself. Right now have to do a chmod 777 for it to work, not ideal.
 
 # Notes to self
  - The version of wpa_supplicant that comes with Raspbian Buster does not work with eduroam WiFi networks. Either [downgrade wpa_supplicant](https://medium.com/good-robot/connect-your-raspberry-pi-to-eduroam-special-instructions-for-raspbian-buster-dfd536003999) or install Raspbian Stretch, last image is available [here](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/).
