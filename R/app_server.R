@@ -1,6 +1,6 @@
 #' The application server-side
-#' 
-#' @param input,output,session Internal parameters for {shiny}. 
+#'
+#' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @importFrom xts xts
@@ -11,32 +11,33 @@
 #' @importFrom plyr dlply
 #' @importFrom rdrop2 drop_auth drop_dir drop_download
 #' @noRd
-app_server <- function( input, output, session ) {
-  local_data_dir <- "data" #where to store data files locally. Cannot container anything else
-  drop_data_dir <- "data" #where the data files on dropbox are located
-  names_file <- "names.csv" #filename of the "masterfile" with beer names
+app_server <- function(input, output, session) {
+  local_data_dir <- "data" # where to store data files locally. Cannot container anything else
+  drop_data_dir <- "data" # where the data files on dropbox are located
+  names_file <- "names.csv" # filename of the "masterfile" with beer names
   drop_auth(rdstoken = "token.rds", cache = FALSE)
-  
+
   getData <- reactive({
     names_filepath <- paste0(drop_data_dir, "/", names_file)
-    
-    #check if local data dir exists
-    if(!dir.exists(local_data_dir))
+
+    # check if local data dir exists
+    if (!dir.exists(local_data_dir)) {
       dir.create(local_data_dir)
-    
-    #list files and hash on dropbox and write to a local file
-    drop_files_status <- drop_dir(drop_data_dir)[,c("name", "path_lower", "content_hash"), drop = FALSE]
-    if(!file.exists("files_status.csv")) {
-      local_files_status <- drop_files_status[,c("name", "content_hash")]
+    }
+
+    # list files and hash on dropbox and write to a local file
+    drop_files_status <- drop_dir(drop_data_dir)[, c("name", "path_lower", "content_hash"), drop = FALSE]
+    if (!file.exists("files_status.csv")) {
+      local_files_status <- drop_files_status[, c("name", "content_hash")]
       fwrite(local_files_status, file = "files_status.csv")
       colnames(local_files_status) <- c("name", "content_hash_local")
     } else {
       local_files_status <- fread("files_status.csv", col.names = c("name", "content_hash_local"))
     }
-    
-    
-    #names_file file on dropbox dominates and decides what to store locally
-    if(any(grepl(paste0(names_filepath, "$"), drop_files_status$path_lower))) {
+
+
+    # names_file file on dropbox dominates and decides what to store locally
+    if (any(grepl(paste0(names_filepath, "$"), drop_files_status$path_lower))) {
       drop_download(
         path = names_filepath,
         local_path = names_filepath,
@@ -44,10 +45,11 @@ app_server <- function( input, output, session ) {
         progress = FALSE,
         verbose = FALSE
       )
-    } else
+    } else {
       stop(paste("No file named", names_file, "found on Dropbox"), call. = FALSE)
-    
-    #read names_file and merge with db file list for checking content hashes
+    }
+
+    # read names_file and merge with db file list for checking content hashes
     names <- merge(
       fread(names_filepath),
       drop_files_status,
@@ -62,8 +64,8 @@ app_server <- function( input, output, session ) {
       by.y = "name",
       all.x = TRUE
     )
-    
-    #list local files, exclude names_file
+
+    # list local files, exclude names_file
     local_data <- list.files(
       local_data_dir,
       full.names = TRUE,
@@ -71,17 +73,17 @@ app_server <- function( input, output, session ) {
       include.dirs = FALSE
     )
     local_data <- local_data[!grepl(paste0(names_file, "$"), local_data)]
-    
-    #delete local files not mentioned in names_file
+
+    # delete local files not mentioned in names_file
     file.remove(local_data[!basename(local_data) %chin% names_comb$filename])
-    
-    #download those that don't exist locally or with changed hash since last time
-    #and load files into a list 
+
+    # download those that don't exist locally or with changed hash since last time
+    # and load files into a list
     datalist <- plyr::dlply(
       names_comb,
       "filename",
       function(x) {
-        if(!x$filename %chin% basename(local_data) | !identical(x$content_hash, x$content_hash_local)) {
+        if (!x$filename %chin% basename(local_data) | !identical(x$content_hash, x$content_hash_local)) {
           drop_download(
             x$path_lower,
             local_path = paste0(local_data_dir, "/", x$filename),
@@ -95,33 +97,33 @@ app_server <- function( input, output, session ) {
           col.names = c("time", "sensor", "value")
         )
         readings$time <- ymd_hm(readings$time, tz = "Europe/Copenhagen")
-        
-        #sometimes observations get added with the same timestamp and sensor if the Pi hasn't adjusted its clock
-        readings <- readings[!duplicated(readings[,c("time", "sensor")]),]
-        
-        #set brew name as attribute to show in selection instead of file names
+
+        # sometimes observations get added with the same timestamp and sensor if the Pi hasn't adjusted its clock
+        readings <- readings[!duplicated(readings[, c("time", "sensor")]), ]
+
+        # set brew name as attribute to show in selection instead of file names
         attr(readings, "brew") <- x$name
         return(readings)
       }
     )
-    
-    #update local hash table
-    fwrite(drop_files_status[,c("name", "content_hash")], file = "files_status.csv")
-    
-    #order by names_file
+
+    # update local hash table
+    fwrite(drop_files_status[, c("name", "content_hash")], file = "files_status.csv")
+
+    # order by names_file
     datalist <- datalist[names_comb$filename]
-    
+
     return(datalist)
   })
-  
+
   output$brew <- renderUI({
     shiny::req(getData())
-    
-    #extract file names and brew names to choose between
+
+    # extract file names and brew names to choose between
     brews <- names(getData())
     names(brews) <- sapply(getData(), attr, "brew")
-    
-    selectInput(
+
+    f7SmartSelect(
       inputId = "brew",
       label = "Beer name",
       choices = brews,
@@ -130,11 +132,11 @@ app_server <- function( input, output, session ) {
     )
   })
   outputOptions(output, "brew", suspendWhenHidden = FALSE)
-  
+
   output$sensor <- renderUI({
     shiny::req(brewData())
     sensors <- sort(unique(brewData()[["sensor"]]))
-    selectInput(
+    f7SmartSelect(
       inputId = "sensor",
       label = "Sensor(s)",
       choices = sensors,
@@ -143,15 +145,15 @@ app_server <- function( input, output, session ) {
     )
   })
   outputOptions(output, "sensor", suspendWhenHidden = FALSE)
-  
+
   output$plot <- renderUI({
-    if(input$plot_type == "Static") {
+    if (isFALSE(input$plot_type)) {
       plotOutput("plot_ggplot")
-    } else if(input$plot_type == "Interactive") {
+    } else if (isTRUE(input$plot_type)) {
       dygraphOutput("plot_dygraphs")
     }
   })
-  
+
   output$abvui <- renderUI({
     tagList(
       numericInput(
@@ -172,41 +174,46 @@ app_server <- function( input, output, session ) {
       )
     )
   })
-  
+
   output$abvres <- renderText({
-    round(1.05*(input$abvcalc_og-input$abvcalc_fg)/(input$abvcalc_fg*0.79)*100, 2)
+    round(1.05 * (input$abvcalc_og - input$abvcalc_fg) / (input$abvcalc_fg * 0.79) * 100, 2)
   })
-  
+
   brewData <- reactive({
     shiny::req(getData(), input$brew)
     getData()[[input$brew]]
   })
-  
+
   output$fermentationInfo <- renderPrint({
     shiny::req(brewData())
     startDate <- brewData()[, min(time)]
-    endDate <- brewData()[,max(time)]
+    endDate <- brewData()[, max(time)]
     duration <- lubridate::as.period(
       lubridate::as.duration(
         lubridate::interval(
-          startDate,endDate)))
+          startDate, endDate
+        )
+      )
+    )
     cat(paste0("Start: ", format(startDate, "%Y-%m-%d %H:%M")))
     cat("\n")
     cat(paste0("Last: ", format(endDate, "%Y-%m-%d %H:%M")))
     cat("\n")
-    cat(paste0("Duration: ", sprintf("%dd %dh %dm",
-                                     duration$day, 
-                                     duration$hour, 
-                                     duration$minute)))
-    if(any(brewData()$sensor == "tiltSG")) {
+    cat(paste0("Duration: ", sprintf(
+      "%dd %dh %dm",
+      duration$day,
+      duration$hour,
+      duration$minute
+    )))
+    if (any(brewData()$sensor == "tiltSG")) {
       latest <- brewData()[sensor %chin% "tiltSG"][.N]
       OG <- brewData()[sensor %chin% "tiltSG", max(value)]
       FG <- brewData()[sensor %chin% "tiltSG", min(value)]
-      attenuation <- round((OG-FG)/(OG-1000)*100, 2)
-      ABV <- round(1.05*(OG-FG)/(FG*0.79)*100, 2)
+      attenuation <- round((OG - FG) / (OG - 1000) * 100, 2)
+      ABV <- round(1.05 * (OG - FG) / (FG * 0.79) * 100, 2)
       cat("\n")
       cat("\n")
-      cat(paste0("SG (", latest[,format(time, format = "%Y-%m-%d %H:%M")], "): ", latest[,value]))
+      cat(paste0("SG (", latest[, format(time, format = "%Y-%m-%d %H:%M")], "): ", latest[, value]))
       cat("\n")
       cat(paste0("OG (max): ", OG))
       cat("\n")
@@ -219,20 +226,23 @@ app_server <- function( input, output, session ) {
       cat("\n")
     }
   })
-  
+
   output$temperaturesInfo <- renderTable({
     shiny::req(brewData())
     out <- brewData()[
       !sensor %chin% "tiltSG",
-      .(min = round(min(value), 2), 
-        mean = round(mean(value), 2), 
+      .(
+        min = round(min(value), 2),
+        mean = round(mean(value), 2),
         max = round(max(value), 2),
-        last = round(last(value), 2)), 
-      by = sensor]
+        last = round(last(value), 2)
+      ),
+      by = sensor
+    ]
     colnames(out)[1] <- "Probe"
     return(out)
   })
-  
+
   output$plot_ggplot <- renderPlot({
     shiny::req(input$sensor, brewData())
     gg <- brewData()[sensor %chin% input$sensor]
@@ -243,7 +253,8 @@ app_server <- function( input, output, session ) {
         x = time,
         y = value,
         color = sensor,
-        group = sensor)
+        group = sensor
+      )
     ) +
       geom_path() +
       theme_minimal() +
@@ -253,39 +264,39 @@ app_server <- function( input, output, session ) {
         legend.title = element_blank()
       ) +
       facet_grid(rows = vars(sensorType), scales = "free_y")
-    if(any(input$sensor %chin% "tiltSG")) {
-      
+    if (any(input$sensor %chin% "tiltSG")) {
+
     }
     return(plot)
   })
-  
+
   output$plot_dygraphs <- renderDygraph({
     shiny::req(input$sensor, brewData())
-    readings <- dcast(brewData()[sensor %chin% input$sensor], time~sensor)
+    readings <- dcast(brewData()[sensor %chin% input$sensor], time ~ sensor)
     xts <- xts(readings, order.by = readings$time)
-    
+
     plot <- dygraph(xts) %>%
-      #dyRangeSelector(height = 100) %>%
+      # dyRangeSelector(height = 100) %>%
       dyOptions(drawPoints = TRUE, pointSize = 2, drawGrid = FALSE) %>%
       dyLegend(show = "follow", width = 200) %>%
       dyLimit(0, color = "red") %>%
       dyUnzoom() %>%
       dyAxis("y", label = "temperature [ºC]", independentTicks = TRUE)
-    if(any(input$sensor %chin% "tiltSG")) {
-      plot <- plot %>% 
-        dyAxis("y2", label = "gravity [g/L]", independentTicks = TRUE) %>% 
+    if (any(input$sensor %chin% "tiltSG")) {
+      plot <- plot %>%
+        dyAxis("y2", label = "gravity [g/L]", independentTicks = TRUE) %>%
         dySeries("tiltSG", axis = "y2")
     }
-    #dyAxis(name = "y", valueRange = c(floor(min(dataSubset()$temperature))-1, ceiling(max(dataSubset()$temperature))+1))
+    # dyAxis(name = "y", valueRange = c(floor(min(dataSubset()$temperature))-1, ceiling(max(dataSubset()$temperature))+1))
     # if((as.numeric(zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]) - as.numeric(zoo::index(dataSubset()[1]))) > 86400) {
     #   plot <- plot %>%
-    #     dyRangeSelector(height = 100, 
+    #     dyRangeSelector(height = 100,
     #                     dateWindow = c(zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]-86400,
     #                                    zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]))
     # }
     return(plot)
   })
-  
+
   output$download <- downloadHandler(
     filename = "readings.csv",
     content = function(file) {

@@ -15,15 +15,15 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package("rdrop2")
-usethis::use_package("shiny")
-usethis::use_package("data.table")
-usethis::use_package("miniUI")
-usethis::use_package("lubridate")
-usethis::use_package("plyr")
-usethis::use_package("ggplot2")
-usethis::use_package("dygraphs")
-usethis::use_package("xts")
+usethis::use_package("rdrop2", min_version = TRUE)
+usethis::use_package("shiny", min_version = TRUE)
+usethis::use_package("data.table", min_version = TRUE)
+usethis::use_package("shinyMobile", min_version = TRUE)
+usethis::use_package("lubridate", min_version = TRUE)
+usethis::use_package("plyr", min_version = TRUE)
+usethis::use_package("ggplot2", min_version = TRUE)
+usethis::use_package("dygraphs", min_version = TRUE)
+usethis::use_package("xts", min_version = TRUE)
 
 ## Add modules ----
 ## Create a module infrastructure in R/
