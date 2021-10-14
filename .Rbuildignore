@@ -15,3 +15,6 @@ $run_dev.*
 ^names.csv$
 ^\.httr-oauth$
 ^files_status.csv$
+^token.rds$
+^app\.R$
+^rsconnect$

@@ -16,6 +16,7 @@ Imports:
     htmltools,
     lubridate,
     miniUI,
+    pkgload,
     plyr,
     rdrop2,
     shiny (>= 1.7.1),
