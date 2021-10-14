@@ -3,7 +3,7 @@
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
 #' @import shiny
-#' @importFrom miniUI gadgetTitleBar miniButtonBlock miniContentPanel miniPage miniTabPanel miniTabstripPanel
+#' @import shinyMobile
 #' @noRd
 app_ui <- function(request) {
   tagList(
