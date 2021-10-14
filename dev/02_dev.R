@@ -25,6 +25,16 @@ usethis::use_package("ggplot2", min_version = TRUE)
 usethis::use_package("dygraphs", min_version = TRUE)
 usethis::use_package("xts", min_version = TRUE)
 
+## Setup Progressive Web App for shinyMobile
+charpente::set_pwa(
+  ".",
+  name = "KaspbeeryPi",
+  shortName = "KaspbeeryPi",
+  description = "Use this app to track the fermentation of my home brewed beer. It tracks the gravity and temperature of my home brewed beer, which is streamed from a Raspberry Pi Zero W near the fermentor. It also has useful tools for the brewer like calculators for adjusting hydrometer readings, ABV, water profile etc. Please, brew more beer yourself!",
+  startUrl = "https://apps.cafekapper.dk/kaspbeerypi",
+  create_dependencies = TRUE
+)
+
 ## Add modules ----
 ## Create a module infrastructure in R/
 #golem::add_module( name = "name_of_module1" ) # Name of the module

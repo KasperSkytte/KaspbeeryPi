@@ -10,7 +10,8 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     f7Page(
-      title = "test",
+      allowPWA = TRUE,
+      title = "KaspbeeryPi",
       f7TabLayout(
         navbar = f7Navbar(
           title = "KaspbeeryPi"
