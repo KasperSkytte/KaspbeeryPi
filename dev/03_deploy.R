@@ -13,6 +13,9 @@
 
 # Test your app
 
+## Style code ----
+styler::style_pkg()
+
 ## Run checks ----
 ## Check the package before sending to prod
 devtools::check(document = TRUE)
