@@ -19,9 +19,9 @@ dropbox_folder = str(os.environ.get("dropbox_folder"))
 
 #create a new filename with the current time as unique identifier
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
-readings = []
 
 def readsensors():
+  readings = []
   #timestamp when reading sensors
   time = datetime.now().strftime("%Y-%b-%d %H:%M")
   print(" *** " + time + " ***")
@@ -76,8 +76,6 @@ def readsensors():
   except Exception as err:
     print("Failed to upload file to dropbox:\n%s" % err)
 
-#run immediately
-readsensors()
 # and then schedule to run with every chosen interval
 schedule.every(read_interval).minutes.do(readsensors)
 
