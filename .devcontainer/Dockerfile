@@ -31,7 +31,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         libfreetype6-dev \
         libpng-dev \
         libtiff5-dev \
-        libcurl4-gnutls-dev \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts \
     && python3 -m pip --no-cache-dir install radian \
     && install2.r --error --skipinstalled --ncpus -1 \
@@ -46,8 +45,3 @@ RUN Rscript -e 'remotes::install_github("ManuelHentschel/vscDebugger@*release", 
 # R Session watcher settings.
 # See more details: https://github.com/REditorSupport/vscode-R/wiki/R-Session-watcher
 RUN echo 'source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >> ${R_HOME}/etc/Rprofile.site
-
-RUN install2.r --error --skipinstalled --ncpus -1 \
-    remotes
-  && rm -rf /tmp/downloaded_packages \
-  && R -e "remotes::install_github('kasperskytte/kaspbeerypi', Ncpus = 10)"
