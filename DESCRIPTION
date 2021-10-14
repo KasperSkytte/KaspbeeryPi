@@ -15,7 +15,6 @@ Imports:
     golem (>= 0.3.1),
     htmltools,
     lubridate (>= 1.7.10),
-    shinyMobile (>= 0.9.0),
     pkgload,
     plyr (>= 1.8.6),
     rdrop2 (>= 0.8.2.1),
@@ -23,7 +22,7 @@ Imports:
     shinyMobile (>= 0.9.0),
     xts (>= 0.12.1)
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.1.1
 URL: https://github.com/kasperskytte/kaspbeerypi
 BugReports: https://github.com/kasperskytte/kaspbeerypi/issues
 Suggests: 
