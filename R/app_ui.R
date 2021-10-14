@@ -10,6 +10,15 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     f7Page(
+      # tags$head(),
+      # add_dependencies(
+      #   body_tag(),
+      #   deps = c(
+      #     "framework7",
+      #     "shinyMobile",
+      #     "pwa",
+      #     "pwacompat"
+      #   )),
       allowPWA = TRUE,
       title = "KaspbeeryPi",
       f7TabLayout(

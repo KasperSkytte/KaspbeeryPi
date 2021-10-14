@@ -31,8 +31,9 @@ charpente::set_pwa(
   name = "KaspbeeryPi",
   shortName = "KaspbeeryPi",
   description = "Use this app to track the fermentation of my home brewed beer. It tracks the gravity and temperature of my home brewed beer, which is streamed from a Raspberry Pi Zero W near the fermentor. It also has useful tools for the brewer like calculators for adjusting hydrometer readings, ABV, water profile etc. Please, brew more beer yourself!",
-  startUrl = "https://apps.cafekapper.dk/kaspbeerypi",
-  create_dependencies = TRUE
+  startUrl = "/kaspbeerypi",
+  create_dependencies = TRUE,
+  register_service_worker = FALSE
 )
 
 ## Add modules ----
