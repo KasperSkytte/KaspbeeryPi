@@ -8,7 +8,7 @@ Live logging of the fermentation of my home brewed beer using the Raspberry Pi Z
 
 The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can, this repo is mainly for my future self to note down wtf I did back then!
 
-Shiny app is live for demo, see [https://kasperskytte.shinyapps.io/KaspbeeryPi/](https://kasperskytte.shinyapps.io/KaspbeeryPi/).
+Shiny app is live for demo, see [https://apps.cafekapper.dk/kaspbeerypi](https://apps.cafekapper.dk/kaspbeerypi). Sorry for the crappy upload speed.
 
 ## Installation
 ### Dropbox app
@@ -26,8 +26,19 @@ sudo rm download.deb
 sudo systemctl restart docker
 ```
 
+This could probably also have been set up using ansible instead of docker, but it works as it is and always will.
+
 ### Running the Shiny app for displaying the logged data
-Run the Shiny app by either hosting it on [https://shinyapps.io](https://shinyapps.io), run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. Use [renv](https://rstudio.github.io/renv/) and the `renv.lock` file to use the exact same R version and packages as me to make sure it works properly. If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
+Run the Shiny app by either hosting it on [https://shinyapps.io](https://shinyapps.io), run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. The Shiny app is bundled as an R package using [`{golem}`](https://thinkr-open.github.io/golem/index.html), install with:
+
+```
+install.packages("remotes")
+remotes::install_github("kasperskytte/kaspbeerypi", Ncpus = 4)
+```
+
+If you run the app non-interactively you will have to authenticate using `token <- rdrop2::drop_auth(key, secret)` on a different machine and save the token to a `rds` file with `saveRDS(token, file = "token.rds")` and transfer the file to the server. Make sure the path to the file in `app.R` is correct.
+
+To start the app run `kaspbeerypi::run_app()`. 
 
 The app will synchronize with the chosen folder on Dropbox based on content hashes and store and load the data locally. This is faster than having to download everything with every launch, and all the logs from finished brews will likely never change again, only the most recent, and maybe still active, will. The file `names.csv` must be created and stored alongside all the individual logs files in the same folder. What's in this file is ultimately deciding what's shown in the app and is also where the brews can be named. See example: [/data/names.csv](https://github.com/KasperSkytte/kaspbeerypi/blob/main/data/names.csv).
 
@@ -35,7 +46,7 @@ The app will synchronize with the chosen folder on Dropbox based on content hash
  - Enable I2C interface through `raspi-config`
  - Start container with either `--privileged`, or expose only the particular device with `--device /dev/i2c-1`
 
-## How to run
+## How to start logging
 Optionally build the docker container image first with `docker build -t kasperskytte/kaspbeerypi:latest logFermentation/`, otherwise pull and start the container and start logging fermentation with:
 
 ### docker-compose
