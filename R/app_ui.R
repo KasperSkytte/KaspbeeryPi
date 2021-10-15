@@ -20,20 +20,30 @@ app_ui <- function(request) {
           animated = TRUE,
           id = "tabs",
           f7Tab(
-            tabName = "Timeline",
+            tabName = "Beers",
             active = TRUE,
-            icon = f7Icon("list_bullet"),
+            icon = f7Icon("rectangle_stack"),
             f7Timeline(
               uiOutput("timeline")
             )
           ),
           f7Tab(
-            tabName = "Graphs",
+            tabName = "Logs",
             icon = f7Icon("graph_square"),
             uiOutput("brew"),
-            highchartOutput("plot_temps"),
-            tags$br(),
-            highchartOutput("plot_gravity")
+            f7Select(
+              inputId = "plot_type",
+              label = "Select plot type",
+              choices = c("Gravity", "Temperatures")
+            ),
+            conditionalPanel(
+              condition = 'input.plot_type == "Gravity"',
+              highchartOutput("plot_gravity", height = "350px")
+            ),
+            conditionalPanel(
+              condition = 'input.plot_type == "Temperatures"',
+              highchartOutput("plot_temps", height = "350px")
+            )
           ),
           f7Tab(
             tabName = "Tools",
@@ -48,6 +58,16 @@ app_ui <- function(request) {
             ),
             uiOutput("toolUI"),
             uiOutput("tool_res")
+          ),
+          f7Tab(
+            tabName = "About",
+            icon = f7Icon("question_square"),
+            p("This Shiny app is a Progressive Web App (PWA) designed for smart phones meaning it can show in full screen giving it the feeling of a native smart phone app, it's just served from the web instead. To install on iOS/Android do the following:"),
+            p("1. Visit", tags$a('https://apps.cafekapper.dk/kaspbeerypi'), "from a web browser on a smart phone"),
+            p("2. Depending on the browser, find and click 'add to home screen'"),
+            p("3. Name it whatever you want, fx KaspbeeryPi"),
+            p("4. Click Add. Clicking the icon from the home screen will now show the app in full screen."
+            )
           )
         )
       )

@@ -156,7 +156,7 @@ app_server <- function(input, output, session) {
           tags$br(),
           "App. attenuation: ", tags$b(att, "%"),
           tags$br(),
-          "Highest temperature (tilt): ", tags$b(
+          "Highest temperature (Tilt): ", tags$b(
             if (tiltTempData[, .N] > 0) {
               tiltTempData[, round(max(value), 2)]
             } else {
@@ -201,7 +201,6 @@ app_server <- function(input, output, session) {
     data_temps <- brewData()[!sensor %chin% "tiltSG"]
     data_temps[, time := datetime_to_timestamp(time)]
     highchart() %>%
-      hc_title(text = "Temperatures") %>%
       hc_xAxis(
         type = "datetime"
         # ,alternateGridColor = "#222222"
@@ -215,7 +214,7 @@ app_server <- function(input, output, session) {
         hcaes(time, value, group = "sensor")
       ) %>%
       hc_navigator(enabled = TRUE) %>%
-      hc_add_theme(hc_theme_hcrt())
+      hc_add_theme(hc_theme_alone())
   })
 
   output$plot_gravity <- renderHighchart({
@@ -223,7 +222,6 @@ app_server <- function(input, output, session) {
     if (data_tilt[, .N] > 0) {
       data_tilt[, time := datetime_to_timestamp(time)]
       highchart() %>%
-        hc_title(text = "Gravity") %>%
         hc_xAxis(
           type = "datetime"
           # ,alternateGridColor = "#222222"
@@ -239,7 +237,7 @@ app_server <- function(input, output, session) {
           showInLegend = FALSE
         ) %>%
         hc_navigator(enabled = TRUE) %>%
-        hc_add_theme(hc_theme_hcrt())
+        hc_add_theme(hc_theme_alone())
     } else {
       highchart()
     }
