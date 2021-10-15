@@ -38,7 +38,8 @@ golem::add_shinyserver_file()
 ## If you want to deploy via a generic Dockerfile
 golem::add_dockerfile(
   from = "rocker/r-ver:4.1.0",
-  repos = "https://mirrors.dotsrc.org/cran/"
+  repos = "https://mirrors.dotsrc.org/cran/",
+  extra_sysreqs = "libglpk40"
 )
 
 ## If you want to deploy to ShinyProxy

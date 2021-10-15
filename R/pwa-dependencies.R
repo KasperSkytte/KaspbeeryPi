@@ -8,14 +8,13 @@
 #' @importFrom htmltools tagList htmlDependency
 #' @export
 add_pwa_deps <- function(tag) {
- pwa_deps <- htmlDependency(
-  name = "pwa-utils",
-  version = packageVersion("kaspbeerypi"),
-  src = c(file = "kaspbeerypi-0.0.1.9000"),
-  head = "<link rel=\"manifest\" href=\"manifest.webmanifest\"  />
+  pwa_deps <- htmlDependency(
+    name = "pwa-utils",
+    version = packageVersion("kaspbeerypi"),
+    src = c(file = "kaspbeerypi-0.0.1.9000"),
+    head = "<link rel=\"manifest\" href=\"manifest.webmanifest\"  />
 <link rel=\"icon\" type=\"image/png\" href=\"icons/icon-144.png\" sizes=\"144x144\" />",
-  package = "kaspbeerypi",
- )
- tagList(tag, pwa_deps)
+    package = "kaspbeerypi",
+  )
+  tagList(tag, pwa_deps)
 }
-    

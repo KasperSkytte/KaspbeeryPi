@@ -18,12 +18,11 @@
 usethis::use_package("rdrop2", min_version = TRUE)
 usethis::use_package("shiny", min_version = TRUE)
 usethis::use_package("data.table", min_version = TRUE)
+usethis::use_package("highcharter", min_version = TRUE)
 usethis::use_package("shinyMobile", min_version = TRUE)
+usethis::use_package("magrittr", min_version = TRUE)
 usethis::use_package("lubridate", min_version = TRUE)
 usethis::use_package("plyr", min_version = TRUE)
-usethis::use_package("ggplot2", min_version = TRUE)
-usethis::use_package("dygraphs", min_version = TRUE)
-usethis::use_package("xts", min_version = TRUE)
 
 ## Setup Progressive Web App for shinyMobile
 charpente::set_pwa(

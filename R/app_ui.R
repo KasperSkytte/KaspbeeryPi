@@ -10,15 +10,6 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     f7Page(
-      # tags$head(),
-      # add_dependencies(
-      #   body_tag(),
-      #   deps = c(
-      #     "framework7",
-      #     "shinyMobile",
-      #     "pwa",
-      #     "pwacompat"
-      #   )),
       allowPWA = TRUE,
       title = "KaspbeeryPi",
       f7TabLayout(
@@ -29,42 +20,34 @@ app_ui <- function(request) {
           animated = TRUE,
           id = "tabs",
           f7Tab(
-            tabName = "Options",
-            icon = f7Icon("slider_horizontal_3"),
-            uiOutput("brew"),
-            uiOutput("sensor"),
-            f7Slider(
-              inputId = "timeinterval",
-              label = "Interval (WIP)",
-              value = 1,
-              min = 1,
-              max = 10
+            tabName = "Timeline",
+            active = TRUE,
+            icon = f7Icon("list_bullet"),
+            f7Timeline(
+              uiOutput("timeline")
             )
           ),
           f7Tab(
             tabName = "Graphs",
             icon = f7Icon("graph_square"),
-            active = TRUE,
-            uiOutput("plot"),
-            f7Toggle(
-              inputId = "plot_type",
-              label = "Interactive plot (dygraphs)",
-              checked = FALSE
-            )
-          ),
-          f7Tab(
-            tabName = "Fermentation",
-            icon = f7Icon("table"),
-            verbatimTextOutput("fermentationInfo"),
-            tableOutput("temperaturesInfo")
+            uiOutput("brew"),
+            highchartOutput("plot_temps"),
+            tags$br(),
+            highchartOutput("plot_gravity")
           ),
           f7Tab(
             tabName = "Tools",
             icon = f7Icon("wrench"),
-            uiOutput("abvui"),
-            tags$hr(),
-            tags$b("Result:"),
-            p(textOutput("abvres", inline = TRUE), "%")
+            f7Select(
+              inputId = "tool",
+              label = "Select a tool",
+              choices = c(
+                "Hydrometer adjustment" = "hydrometer",
+                "Alcohol by Volume (ABV)" = "abv"
+              )
+            ),
+            uiOutput("toolUI"),
+            uiOutput("tool_res")
           )
         )
       )

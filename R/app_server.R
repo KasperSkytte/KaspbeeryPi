@@ -3,10 +3,9 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
-#' @importFrom xts xts
+#' @import highcharter
+#' @importFrom magrittr %>%
 #' @importFrom data.table dcast fifelse fread fwrite last rbindlist %chin%
-#' @importFrom dygraphs dyAxis dygraph dygraphOutput dyLegend dyLimit dyOptions dySeries dyUnzoom renderDygraph
-#' @importFrom ggplot2 aes element_blank facet_grid geom_path ggplot theme theme_minimal vars
 #' @importFrom lubridate as.duration as.period interval ymd_hm
 #' @importFrom plyr dlply
 #' @importFrom rdrop2 drop_auth drop_dir drop_download
@@ -116,6 +115,72 @@ app_server <- function(input, output, session) {
     return(datalist)
   })
 
+  brewData <- reactive({
+    shiny::req(getData(), input$brew)
+    getData()[[input$brew]]
+  })
+
+  output$timeline <- renderUI({
+    lapply(rev(getData()), function(beer) {
+      startDate <- beer[, min(time)]
+      endDate <- beer[, max(time)]
+      duration <- lubridate::as.period(
+        lubridate::as.duration(
+          lubridate::interval(
+            startDate, endDate
+          )
+        )
+      )
+
+      tiltGData <- beer[sensor %chin% "tiltSG"]
+      if (tiltGData[, .N] > 0) {
+        OG <- tiltGData[, max(value)]
+        FG <- tiltGData[, min(value)]
+        att <- round((OG - FG) / (OG - 1000) * 100, 2)
+        ABV <- round(1.05 * (OG - FG) / (FG * 0.79) * 100, 2)
+      } else {
+        OG <- FG <- att <- ABV <- "N/A"
+      }
+
+      tiltTempData <- beer[sensor %chin% "tiltTempC"]
+
+      f7TimelineItem(
+        title = attr(beer, "brew"),
+        date = format(startDate, "%Y %b %d"),
+        card = TRUE,
+        subtitle = tagList(
+          p("OG: ", tags$b(OG), "FG: ", tags$b(FG))
+        ),
+        tagList(
+          "ABV: ", tags$b(ABV, "%"),
+          tags$br(),
+          "App. attenuation: ", tags$b(att, "%"),
+          tags$br(),
+          "Highest temperature (tilt): ", tags$b(
+            if (tiltTempData[, .N] > 0) {
+              tiltTempData[, round(max(value), 2)]
+            } else {
+              "N/A"
+            }
+          ),
+          tags$br(),
+          "Ended: ",
+          tags$b(format(endDate, "%Y %b %d")),
+          tags$br(),
+          "Duration: ",
+          tags$b(
+            sprintf(
+              "%dd %dh %dm",
+              duration$day,
+              duration$hour,
+              duration$minute
+            )
+          )
+        )
+      )
+    })
+  })
+
   output$brew <- renderUI({
     shiny::req(getData())
 
@@ -123,178 +188,163 @@ app_server <- function(input, output, session) {
     brews <- names(getData())
     names(brews) <- sapply(getData(), attr, "brew")
 
-    f7SmartSelect(
+    f7Select(
       inputId = "brew",
-      label = "Beer name",
+      label = "Select beer",
       choices = brews,
-      selected = last(brews),
-      multiple = FALSE
+      selected = last(brews)
     )
   })
   outputOptions(output, "brew", suspendWhenHidden = FALSE)
 
-  output$sensor <- renderUI({
-    shiny::req(brewData())
-    sensors <- sort(unique(brewData()[["sensor"]]))
-    f7SmartSelect(
-      inputId = "sensor",
-      label = "Sensor(s)",
-      choices = sensors,
-      selected = sensors,
-      multiple = TRUE
-    )
+  output$plot_temps <- renderHighchart({
+    data_temps <- brewData()[!sensor %chin% "tiltSG"]
+    data_temps[, time := datetime_to_timestamp(time)]
+    highchart() %>%
+      hc_title(text = "Temperatures") %>%
+      hc_xAxis(
+        type = "datetime"
+        # ,alternateGridColor = "#222222"
+      ) %>%
+      hc_yAxis(
+        title = list(text = "Temperature [°C]")
+      ) %>%
+      hc_add_series(
+        data_temps,
+        "line",
+        hcaes(time, value, group = "sensor")
+      ) %>%
+      hc_navigator(enabled = TRUE) %>%
+      hc_add_theme(hc_theme_hcrt())
   })
-  outputOptions(output, "sensor", suspendWhenHidden = FALSE)
 
-  output$plot <- renderUI({
-    if (isFALSE(input$plot_type)) {
-      plotOutput("plot_ggplot")
-    } else if (isTRUE(input$plot_type)) {
-      dygraphOutput("plot_dygraphs")
+  output$plot_gravity <- renderHighchart({
+    data_tilt <- brewData()[sensor %chin% "tiltSG"]
+    if (data_tilt[, .N] > 0) {
+      data_tilt[, time := datetime_to_timestamp(time)]
+      highchart() %>%
+        hc_title(text = "Gravity") %>%
+        hc_xAxis(
+          type = "datetime"
+          # ,alternateGridColor = "#222222"
+        ) %>%
+        hc_yAxis(
+          title = list(text = "Specific gravity [g/L]")
+        ) %>%
+        hc_add_series(
+          data_tilt,
+          "line",
+          hcaes(time, value),
+          name = "Specific gravity",
+          showInLegend = FALSE
+        ) %>%
+        hc_navigator(enabled = TRUE) %>%
+        hc_add_theme(hc_theme_hcrt())
+    } else {
+      highchart()
     }
   })
 
-  output$abvui <- renderUI({
-    tagList(
-      numericInput(
-        inputId = "abvcalc_og",
-        label = "Original gravity",
-        value = brewData()[sensor %chin% "tiltSG", max(value)],
-        min = 1000,
-        max = 1200,
-        step = 1
-      ),
-      numericInput(
-        inputId = "abvcalc_fg",
-        label = "Final gravity",
-        value = brewData()[sensor %chin% "tiltSG", min(value)],
-        min = 1000,
-        max = 1200,
-        step = 1
-      )
-    )
-  })
-
-  output$abvres <- renderText({
-    round(1.05 * (input$abvcalc_og - input$abvcalc_fg) / (input$abvcalc_fg * 0.79) * 100, 2)
-  })
-
-  brewData <- reactive({
-    shiny::req(getData(), input$brew)
-    getData()[[input$brew]]
-  })
-
-  output$fermentationInfo <- renderPrint({
+  output$toolUI <- renderUI({
     shiny::req(brewData())
-    startDate <- brewData()[, min(time)]
-    endDate <- brewData()[, max(time)]
-    duration <- lubridate::as.period(
-      lubridate::as.duration(
-        lubridate::interval(
-          startDate, endDate
+    if (input$tool == "abv") {
+      data_tilt <- brewData()[sensor %chin% "tiltSG"]
+      tagList(
+        f7Stepper(
+          inputId = "abvcalc_og",
+          label = "Original gravity",
+          value = if (data_tilt[, .N] > 0) data_tilt[, max(value)] else 1050,
+          min = 1000,
+          max = 1200,
+          step = 1
+        ),
+        tags$br(),
+        f7Stepper(
+          inputId = "abvcalc_fg",
+          label = "Final gravity",
+          value = if (data_tilt[, .N] > 0) data_tilt[, min(value)] else 1012,
+          min = 1000,
+          max = 1200,
+          step = 1
         )
       )
-    )
-    cat(paste0("Start: ", format(startDate, "%Y-%m-%d %H:%M")))
-    cat("\n")
-    cat(paste0("Last: ", format(endDate, "%Y-%m-%d %H:%M")))
-    cat("\n")
-    cat(paste0("Duration: ", sprintf(
-      "%dd %dh %dm",
-      duration$day,
-      duration$hour,
-      duration$minute
-    )))
-    if (any(brewData()$sensor == "tiltSG")) {
-      latest <- brewData()[sensor %chin% "tiltSG"][.N]
-      OG <- brewData()[sensor %chin% "tiltSG", max(value)]
-      FG <- brewData()[sensor %chin% "tiltSG", min(value)]
-      attenuation <- round((OG - FG) / (OG - 1000) * 100, 2)
-      ABV <- round(1.05 * (OG - FG) / (FG * 0.79) * 100, 2)
-      cat("\n")
-      cat("\n")
-      cat(paste0("SG (", latest[, format(time, format = "%Y-%m-%d %H:%M")], "): ", latest[, value]))
-      cat("\n")
-      cat(paste0("OG (max): ", OG))
-      cat("\n")
-      cat(paste0("FG (min): ", FG))
-      cat("\n")
-      cat("\n")
-      cat(paste0("App. attenuation: ", attenuation, "%"))
-      cat("\n")
-      cat(paste0("ABV: ", ABV, "%"))
-      cat("\n")
-    }
-  })
-
-  output$temperaturesInfo <- renderTable({
-    shiny::req(brewData())
-    out <- brewData()[
-      !sensor %chin% "tiltSG",
-      .(
-        min = round(min(value), 2),
-        mean = round(mean(value), 2),
-        max = round(max(value), 2),
-        last = round(last(value), 2)
-      ),
-      by = sensor
-    ]
-    colnames(out)[1] <- "Probe"
-    return(out)
-  })
-
-  output$plot_ggplot <- renderPlot({
-    shiny::req(input$sensor, brewData())
-    gg <- brewData()[sensor %chin% input$sensor]
-    gg <- gg[, sensorType := fifelse(sensor == "tiltSG", "Gravity", "Temperature")]
-    plot <- ggplot(
-      gg,
-      aes(
-        x = time,
-        y = value,
-        color = sensor,
-        group = sensor
+    } else if (input$tool == "hydrometer") {
+      tagList(
+        f7Stepper(
+          inputId = "hydrometer_temp",
+          label = "Temperature",
+          value = 70,
+          min = 0,
+          max = 212,
+          step = 1
+        ),
+        tags$br(),
+        f7Stepper(
+          inputId = "hydrometer_sg",
+          label = "Specific gravity",
+          value = 1065,
+          min = 1000,
+          max = 1200,
+          step = 1
+        ),
+        tags$br(),
+        f7Stepper(
+          inputId = "hydrometer_calibtemp",
+          label = "Hydrometer calibration temperature",
+          value = 20,
+          min = 0,
+          max = 50,
+          step = 1
+        ),
+        tags$br(),
+        shiny::radioButtons(
+          inputId = "hydrometer_unit",
+          label = "",
+          choices = c(
+            "Celcius",
+            "Fahrenheit"
+          ),
+          inline = TRUE,
+          selected = "Celcius"
+        )
       )
-    ) +
-      geom_path() +
-      theme_minimal() +
-      theme(
-        axis.title = element_blank(),
-        legend.position = "bottom",
-        legend.title = element_blank()
-      ) +
-      facet_grid(rows = vars(sensorType), scales = "free_y")
-    if (any(input$sensor %chin% "tiltSG")) {
-
     }
-    return(plot)
   })
 
-  output$plot_dygraphs <- renderDygraph({
-    shiny::req(input$sensor, brewData())
-    readings <- dcast(brewData()[sensor %chin% input$sensor], time ~ sensor)
-    xts <- xts(readings, order.by = readings$time)
+  output$tool_res <- renderUI({
+    shiny::req(input$hydrometer_unit)
+    if (input$tool == "abv") {
+      tagList(
+        p(
+          "Result: ",
+          tags$b(
+            round(1.05 * (input$abvcalc_og - input$abvcalc_fg) / (input$abvcalc_fg * 0.79) * 100, 2)
+          )
+        )
+      )
+    } else if (input$tool == "hydrometer") {
+      # formula from http://www.musther.net/vinocalc.html
+      # formula is for temperatures in fahrenheit only, range: 0-60C
+      SG <- input$hydrometer_sg
+      temp <- input$hydrometer_temp
+      calibTemp <- input$hydrometer_calibtemp
 
-    plot <- dygraph(xts) %>%
-      # dyRangeSelector(height = 100) %>%
-      dyOptions(drawPoints = TRUE, pointSize = 2, drawGrid = FALSE) %>%
-      dyLegend(show = "follow", width = 200) %>%
-      dyLimit(0, color = "red") %>%
-      dyUnzoom() %>%
-      dyAxis("y", label = "temperature [ºC]", independentTicks = TRUE)
-    if (any(input$sensor %chin% "tiltSG")) {
-      plot <- plot %>%
-        dyAxis("y2", label = "gravity [g/L]", independentTicks = TRUE) %>%
-        dySeries("tiltSG", axis = "y2")
+      if (input$hydrometer_unit == "Celcius") {
+        temp <- temp * 1.8 + 32
+        calibTemp <- calibTemp * 1.8 + 32
+      }
+      CSG <- SG * ((1.00130346 - (0.000134722124 * temp) + (0.00000204052596 * temp^2) - (0.00000000232820948 * temp^3)) /
+        (1.00130346 - (0.000134722124 * calibTemp) + (0.00000204052596 * calibTemp^2) - (0.00000000232820948 * calibTemp^3)))
+
+      tagList(
+        p(
+          "Result: ",
+          tags$b(
+            round(CSG, 2)
+          )
+        )
+      )
     }
-    # dyAxis(name = "y", valueRange = c(floor(min(dataSubset()$temperature))-1, ceiling(max(dataSubset()$temperature))+1))
-    # if((as.numeric(zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]) - as.numeric(zoo::index(dataSubset()[1]))) > 86400) {
-    #   plot <- plot %>%
-    #     dyRangeSelector(height = 100,
-    #                     dateWindow = c(zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]-86400,
-    #                                    zoo::index(dataSubset())[length(unique(zoo::index(dataSubset())))]))
-    # }
-    return(plot)
   })
 
   output$download <- downloadHandler(
