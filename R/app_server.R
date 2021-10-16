@@ -16,6 +16,10 @@ app_server <- function(input, output, session) {
   names_file <- "names.csv" # filename of the "masterfile" with beer names
   drop_auth(rdstoken = "token.rds", cache = FALSE)
 
+  hcGopts <- getOption("highcharter.global")
+  hcGopts$useUTC <- FALSE
+  options(highcharter.global = hcGopts)
+
   getData <- reactive({
     names_filepath <- paste0(drop_data_dir, "/", names_file)
 
@@ -164,8 +168,8 @@ app_server <- function(input, output, session) {
             }
           ),
           tags$br(),
-          "Ended: ",
-          tags$b(format(endDate, "%Y %b %d")),
+          "Last measurement: ",
+          tags$b(format(endDate, "%Y %b %d %H:%M")),
           tags$br(),
           "Duration: ",
           tags$b(
