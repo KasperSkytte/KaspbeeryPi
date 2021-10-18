@@ -56,8 +56,10 @@ app_ui <- function(request) {
                 "Alcohol by Volume (ABV)" = "abv"
               )
             ),
-            uiOutput("toolUI"),
-            uiOutput("tool_res")
+            f7Card(
+              uiOutput("toolUI"),
+              footer = uiOutput("tool_res")
+            )
           ),
           f7Tab(
             tabName = "About",

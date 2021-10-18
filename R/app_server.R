@@ -168,7 +168,7 @@ app_server <- function(input, output, session) {
             }
           ),
           tags$br(),
-          "Last measurement: ",
+          "Last update: ",
           tags$b(format(endDate, "%Y %b %d %H:%M")),
           tags$br(),
           "Duration: ",
@@ -254,50 +254,61 @@ app_server <- function(input, output, session) {
       tagList(
         f7Stepper(
           inputId = "abvcalc_og",
-          label = "Original gravity",
+          label = "",
           value = if (data_tilt[, .N] > 0) data_tilt[, max(value)] else 1050,
           min = 1000,
           max = 1200,
           step = 1
         ),
+        helpText("  Original gravity"),
         tags$br(),
         f7Stepper(
           inputId = "abvcalc_fg",
-          label = "Final gravity",
+          label = "",
           value = if (data_tilt[, .N] > 0) data_tilt[, min(value)] else 1012,
           min = 1000,
           max = 1200,
           step = 1
-        )
+        ),
+        helpText("Final gravity")
       )
     } else if (input$tool == "hydrometer") {
       tagList(
         f7Stepper(
           inputId = "hydrometer_temp",
-          label = "Temperature",
-          value = 70,
+          label = "",
+          value = 60,
           min = 0,
-          max = 212,
-          step = 1
+          max = 70,
+          step = 1,
+          manual = TRUE,
+          decimalPoint = 1
         ),
+        helpText("  Temperature"),
         tags$br(),
         f7Stepper(
           inputId = "hydrometer_sg",
-          label = "Specific gravity",
+          label = "",
           value = 1065,
           min = 1000,
-          max = 1200,
-          step = 1
+          max = 1150,
+          step = 1,
+          manual = TRUE,
+          decimalPoint = 1
         ),
+        helpText("  Specific gravity"),
         tags$br(),
         f7Stepper(
           inputId = "hydrometer_calibtemp",
-          label = "Hydrometer calibration temperature",
+          label = "",
           value = 20,
           min = 0,
           max = 50,
-          step = 1
+          step = 1,
+          manual = TRUE,
+          decimalPoint = 1
         ),
+        helpText("  Calibration temperature"),
         tags$br(),
         shiny::radioButtons(
           inputId = "hydrometer_unit",
@@ -312,6 +323,22 @@ app_server <- function(input, output, session) {
       )
     }
   })
+  
+  observeEvent(input$hydrometer_unit, {
+    if(input$hydrometer_unit == "Fahrenheit") {
+      updateF7Slider(
+        inputId = "hydrometer_temp",
+        min = 32,
+        max = 158
+      )
+    } else if (input$hydrometer_unit == "Celcius") {
+      updateF7Slider(
+        inputId = "hydrometer_temp",
+        min = 0,
+        max = 70
+      )
+    }
+  })
 
   output$tool_res <- renderUI({
     shiny::req(input$hydrometer_unit)
@@ -320,7 +347,8 @@ app_server <- function(input, output, session) {
         p(
           "Result: ",
           tags$b(
-            round(1.05 * (input$abvcalc_og - input$abvcalc_fg) / (input$abvcalc_fg * 0.79) * 100, 2)
+            round(1.05 * (input$abvcalc_og - input$abvcalc_fg) / (input$abvcalc_fg * 0.79) * 100, 2),
+            "%"
           )
         )
       )
@@ -342,7 +370,8 @@ app_server <- function(input, output, session) {
         p(
           "Result: ",
           tags$b(
-            round(CSG, 2)
+            round(CSG, 2),
+            "g/L"
           )
         )
       )
