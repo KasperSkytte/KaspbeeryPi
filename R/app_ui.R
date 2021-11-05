@@ -65,7 +65,7 @@ app_ui <- function(request) {
             tabName = "About",
             icon = f7Icon("question_square"),
             p("This Shiny app is a Progressive Web App (PWA) designed for smart phones meaning it can show in full screen giving it the feeling of a native smart phone app, it's just served from the web instead. To install on iOS/Android do the following:"),
-            p("1. Visit", tags$a('https://apps.cafekapper.dk/kaspbeerypi'), "from a web browser on a smart phone"),
+            p("1. Visit", tags$a('https://kasperskytte.shinyapps.io/KaspbeeryPi/'), "from a web browser on a smart phone"),
             p("2. Depending on the browser, find and click 'add to home screen'"),
             p("3. Name it whatever you want, fx KaspbeeryPi"),
             p("4. Click Add. Clicking the icon from the home screen will now show the app in full screen."
