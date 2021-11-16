@@ -68,8 +68,9 @@ app_ui <- function(request) {
             p("1. Visit", tags$a('https://kasperskytte.shinyapps.io/KaspbeeryPi/'), "from a web browser on a smart phone"),
             p("2. Depending on the browser, find and click 'add to home screen'"),
             p("3. Name it whatever you want, fx KaspbeeryPi"),
-            p("4. Click Add. Clicking the icon from the home screen will now show the app in full screen."
-            )
+            p("4. Click Add. Clicking the icon from the home screen will now show the app in full screen."),
+            tags$hr(""),
+            p(f7Icon("logo_github"), "Sauce code: ", tags$a("https://github.com/kasperskytte/kaspbeerypi"))
           )
         )
       )
