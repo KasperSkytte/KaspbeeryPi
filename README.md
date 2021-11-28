@@ -8,7 +8,7 @@ Live logging of the fermentation of my home brewed beer using the Raspberry Pi Z
 
 The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can, this repo is mainly for my future self to note down wtf I did back then!
 
-Shiny app is live for demo, see [https://kasperskytte.shinyapps.io/KaspbeeryPi/](https://kasperskytte.shinyapps.io/KaspbeeryPi/).
+Shiny app is live for demo, see [https://apps.cafekapper.dk/kaspbeerypi/](https://apps.cafekapper.dk/kaspbeerypi/).
 
 ## Installation
 ### Dropbox app
