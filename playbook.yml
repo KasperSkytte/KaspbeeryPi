@@ -1,6 +1,6 @@
 ---
 - hosts:
-  - kaspbeerypi
+  - all
   become: yes
   vars:
     apt_pkgs:
@@ -21,7 +21,7 @@
         force_apt_get: "yes"
 
 - hosts:
-  - kaspbeerypi
+  - all
   become: yes
   vars_files:
     - ansible_vars.yml
