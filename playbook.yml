@@ -23,6 +23,8 @@
   - kaspbeerypi
   become: yes
   vars:
+    pip_package: python3-pip
+    pip_executable: pip3
     pip_install_packages:
       - dropbox==11.16.0
       - interruptingcow==0.8
@@ -57,16 +59,19 @@
         dest: "/opt/logFermentation/vars.py"
         mode: 0755
 
-    # - name: Copy readsensors systemd service file
-    #   copy:
-    #     src: readsensors.service
-    #     dest: /etc/systemd/system
-    #     owner: root
-    #     group: root
-    #     mode: 0755
+    - name: Copy systemd service files
+      copy:
+        src: "{{ item }}"
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - logFermentation/readsensors.service
+        - logFermentation/scrollit.service
 
-    # - name: Start readsensors
-    #   systemd:
-    #     name: readsensors
-    #     state: started
-    #     enabled: yes
+    - name: Start readsensors
+      systemd:
+        name: readsensors
+        state: started
+        enabled: yes

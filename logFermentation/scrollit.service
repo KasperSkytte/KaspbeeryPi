@@ -1,0 +1,10 @@
+[Unit]
+Description=scrollit scrolls text on the scrollphathd
+
+[Service]
+User=root
+Group=root
+ExecStart=/opt/logFermentation/scrollit.py
+
+[Install]
+WantedBy=multi-user.target
