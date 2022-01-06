@@ -1,43 +1,43 @@
 ---
-# - hosts:
-#   - all
-#   become: yes
-#   vars:
-#     apt_pkgs:
-#       - gcc
-#       - bluez
-#       - libbluetooth-dev
-#       - python3-pip
-#       - libatlas-base-dev
-#   tasks:
-#     - name: "apt full-upgrade"
-#       apt:
-#         update_cache: yes
-#         upgrade: full
+- hosts:
+  - all
+  become: yes
+  vars:
+    apt_pkgs:
+      - gcc
+      - bluez
+      - libbluetooth-dev
+      - python3-pip
+      - libatlas-base-dev
+  tasks:
+    - name: "apt full-upgrade"
+      apt:
+        update_cache: yes
+        upgrade: full
 
-#     - name: "Install system packages"
-#       apt:
-#         name: "{{ apt_pkgs }}"
-#         state: present
-#         force_apt_get: "yes"
+    - name: "Install system packages"
+      apt:
+        name: "{{ apt_pkgs }}"
+        state: present
+        force_apt_get: "yes"
 
 - hosts:
   - all
   become: yes
   vars_files:
     - readsensors_vars.yml
-  # vars:
-  #   pip_package: python3-pip
-  #   pip_executable: pip3
-  #   pip_install_packages:
-  #     - dropbox
-  #     - interruptingcow
-  #     - w1thermsensor
-  #     - pybluez
-  #     - scrollphathd
-  #     - schedule
-  # roles:
-  #   - geerlingguy.pip
+  vars:
+    pip_package: python3-pip
+    pip_executable: pip3
+    pip_install_packages:
+      - dropbox
+      - interruptingcow
+      - w1thermsensor
+      - pybluez
+      - scrollphathd
+      - schedule
+  roles:
+    - geerlingguy.pip
   tasks:
     - name: Create /opt/logFermentation/ folder
       file:
