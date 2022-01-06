@@ -25,7 +25,7 @@
   - all
   become: yes
   vars_files:
-    - ansible_vars.yml
+    - readsensors_vars.yml
   # vars:
   #   pip_package: python3-pip
   #   pip_executable: pip3
@@ -39,6 +39,9 @@
   # roles:
   #   - geerlingguy.pip
   tasks:
+    - name: debug
+      debug:
+        msg: "{{ test }}"
     - name: Create /opt/logFermentation/ folder
       file:
         path: /opt/logFermentation/
