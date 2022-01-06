@@ -4,7 +4,7 @@
 <!-- badges: end -->
 
 # KaspbeeryPi
-Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the [Tilt hydrometer](https://tilthydrometer.com/) through Bluetooth. Data is uploaded to dropbox with every reading (default every 5 minutes), where a Shiny app can then grab it for plotty plots.
+Live logging of the fermentation of my home brewed beer using the Raspberry Pi Zero W. Logs the readings of multiple DS18B20 digital thermometers through the 1-Wire interface as well as the specific gravity using the [Tilt hydrometer](https://tilthydrometer.com/) through Bluetooth. Data is uploaded to dropbox with every reading (default every 15 minutes), where a Shiny app can then grab it for plotty plots.
 
 The micro SD card in my Raspberry Pi Zero W just burned out and I had to set up everything again from scratch. This time I chose Docker to be prepared for the next time this happens. Use what you can, this repo is mainly for my future self to note down wtf I did back then!
 
@@ -63,7 +63,8 @@ services:
       - dropbox_folder=data
       - tilt_id=a495bb30c5b14b44b5121370f02d74de
       - tilt_sg_adjust=0
-      - read_interval=5
+      - read_interval=15
+      - brewfatherCustomStreamURL=pastehere
     volumes:
       - ${PWD}/data:/data
     network_mode: "host"
@@ -91,7 +92,8 @@ docker run \
   -e dropbox_folder=data \
   -e tilt_id=a495bb30c5b14b44b5121370f02d74de \
   -e tilt_sg_adjust=0 \
-  -e read_interval=5 \
+  -e read_interval=15 \
+  -e brewfatherCustomStreamURL=pastehere \
   kasperskytte/kaspbeerypi:latest
 ```
 
@@ -106,6 +108,7 @@ A few options as well as the dropbox token are set using the following environme
 | tilt_id | ID of the Tilt hydrometer, default is the black version |
 | tilt_sg_adjust | Add an integer to the Tilt gravity reading for calibration. This is useful when changing the battery as its weight can be slightly different compared to the stock battery. |
 | read_interval | Time in minutes between reading sensors and tilt |
+| brewfatherCustomStreamURL | API URL to BrewFather custom stream |
 
 By default a volume named `/data` is used to store the data until restart/reboot. If you want the data to be persistently stored locally on the Pi, just mount `/data` in the container to somewhere on the host. The data is continuously being uploaded to dropbox with every read, but if there is no internet connection for the entire duration, nothing will be backed up on dropbox, so in this case it's nice to save things locally.
 

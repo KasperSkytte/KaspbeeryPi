@@ -5,6 +5,8 @@ import dropbox
 import sys
 import os
 import schedule
+import requests
+import json
 from dropbox.files import WriteMode
 from interruptingcow import timeout
 from w1thermsensor import W1ThermSensor
@@ -16,6 +18,8 @@ tilt_sg_adjust = int(os.environ.get("tilt_sg_adjust"))
 read_interval = int(os.environ.get("read_interval"))
 dropbox_token = str(os.environ.get("dropbox_token"))
 dropbox_folder = str(os.environ.get("dropbox_folder"))
+#see https://docs.brewfather.app/integrations/custom-stream for expected format
+brewfatherCustomStreamURL = str(os.environ.get("brewfatherCustomStreamURL"))
 
 #create a new filename with the current time as unique identifier
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
@@ -37,7 +41,7 @@ def readsensors():
         returnedList = blescan.parse_events(sock, 10)
         for beacon in returnedList: #returnedList is a list datatype of string datatypes seperated by commas (,)
           output = beacon.split(',') #split the list into individual strings in an array
-          if output[1] == tilt_id: #Change this to the colour of you tilt
+          if output[1] == tilt_id: #Change this to the colour of your tilt
             tempf = float(output[2]) #convert the string for the temperature to a float type
             gotData = 1
             tiltSG = int(output[3])+tilt_sg_adjust
@@ -52,13 +56,39 @@ def readsensors():
   if gotData == 1:
     readings.append([str(time), "tiltSG", str(tiltSG)])
     readings.append([str(time), "tiltTempC", str(tiltTempC)])
+    #post to BrewFather API
+    tiltJSON = {
+      "name": "Tilt",
+      "temp": tiltTempC,
+      "gravity": tiltSG/1000,
+      "gravity_unit": "G",
+      "comment": "ID: " + tilt_id + ", Adjusted: " + tilt_sg_adjust
+    }
+    post = requests.post(brewfatherCustomStreamURL, json = tiltJSON)
+    print(post.text)
 
   #read 1-wire thermometers
+  #JSON to post to BrewFather API
+  probes = {
+    "name": "Probes",
+    "temp_unit": "C",
+    "comment": "Temp: Probe03, Room Temp: Probe05, Fridge Temp: Probe04",
+  }
   for sensor in W1ThermSensor.get_available_sensors():
     id = "Probe"+str(sensor.id)[0:2]
-    temp = str(round(sensor.get_temperature(), 3))
-    print(id+": "+temp)
-    readings.append([str(time), id, temp])
+    temp = round(sensor.get_temperature(), 3)
+    if id == "Probe03":
+      probes["temp"] = temp
+    elif id == "Probe04":
+      probes["aux_temp"] = temp
+    elif id == "Probe05":
+      probes["ext_temp"] = temp
+    print(id+": "+str(temp))
+    
+    #post to BrewFather API
+    post = requests.post(brewfatherCustomStreamURL, json = probes)
+    print(post.text)
+    readings.append([str(time), id, str(temp)])
 
   #tidy console output in blocks for each timestamp
   print("-------------------------\n")

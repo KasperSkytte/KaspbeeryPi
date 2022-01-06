@@ -10,6 +10,7 @@ services:
       - tilt_id=a495bb30c5b14b44b5121370f02d74de
       - tilt_sg_adjust=0
       - read_interval=5
+      - brewfatherCustomStreamURL=pastehere
     volumes:
       - ${PWD}/data:/data
     network_mode: "host"
