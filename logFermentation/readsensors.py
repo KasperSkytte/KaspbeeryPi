@@ -18,7 +18,7 @@ from datetime import datetime
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
 
 #function to post to BrewFather API
-def postBrewfather(json, brewfatherCustomStreamURL = brewfatherCustomStreamURL):
+def postBrewfather(json, brewfatherCustomStreamURL = vars.brewfatherCustomStreamURL):
   try:
     post = requests.post(brewfatherCustomStreamURL, json = json)
     print(post.text)
@@ -42,10 +42,10 @@ def readsensors():
         returnedList = blescan.parse_events(sock, 10)
         for beacon in returnedList: #returnedList is a list datatype of string datatypes seperated by commas (,)
           output = beacon.split(',') #split the list into individual strings in an array
-          if output[1] == tilt_id: #Change this to the colour of your tilt
+          if output[1] == vars.tilt_id: #Change this to the colour of your tilt
             tempf = float(output[2]) #convert the string for the temperature to a float type
             gotData = 1
-            tiltSG = int(output[3])+tilt_sg_adjust
+            tiltSG = int(output[3])+vars.tilt_sg_adjust
             tiltTempC = round((tempf-32)/1.8, 3)
       blescan.hci_disable_le_scan(sock)
       print("Tilt temp: "+str(tiltTempC)+"\nTilt SG: "+str(tiltSG))
@@ -98,14 +98,14 @@ def readsensors():
 
   #upload file to dropbox
   try:
-    dbx = dropbox.Dropbox(dropbox_token)
+    dbx = dropbox.Dropbox(vars.dropbox_token)
     with open(filepath, "rb+") as file:
-        dbx.files_upload(file.read(), "/" + dropbox_folder + "/" + filepath, mode=WriteMode("overwrite"), mute=True)
+        dbx.files_upload(file.read(), "/" + vars.dropbox_folder + "/" + filepath, mode=WriteMode("overwrite"), mute=True)
   except Exception as err:
     print("Failed to upload file to dropbox:\n%s" % err)
 
 # and then schedule to run with every chosen interval
-schedule.every(read_interval).minutes.do(readsensors)
+schedule.every(vars.read_interval).minutes.do(readsensors)
 
 try:
   while True:
