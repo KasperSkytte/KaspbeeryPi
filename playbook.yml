@@ -23,6 +23,8 @@
 - hosts:
   - kaspbeerypi
   become: yes
+  vars_files:
+    - ansible_vars.yml
   vars:
     pip_package: python3-pip
     pip_executable: pip3
