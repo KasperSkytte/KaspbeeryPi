@@ -1,0 +1,6 @@
+all:
+  hosts:
+    kaspbeerypi:
+      ansible_host: 10.8.0.6
+      ansible_port: 22
+      ansible_user: pi

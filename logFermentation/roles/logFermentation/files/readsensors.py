@@ -1,4 +1,5 @@
 import blescan
+import vars
 import bluetooth._bluetooth as bluez
 import csv
 import dropbox
@@ -12,17 +13,16 @@ from interruptingcow import timeout
 from w1thermsensor import W1ThermSensor
 from datetime import datetime
 
-#get options from system environment variables
-tilt_id = str(os.environ.get("tilt_id"))
-tilt_sg_adjust = int(os.environ.get("tilt_sg_adjust"))
-read_interval = int(os.environ.get("read_interval"))
-dropbox_token = str(os.environ.get("dropbox_token"))
-dropbox_folder = str(os.environ.get("dropbox_folder"))
-#see https://docs.brewfather.app/integrations/custom-stream for expected format
-brewfatherCustomStreamURL = str(os.environ.get("brewfatherCustomStreamURL"))
-
 #create a new filename with the current time as unique identifier
 filepath = datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
+
+#function to post to BrewFather API
+def postBrewfather(json, brewfatherCustomStreamURL = brewfatherCustomStreamURL):
+  try:
+    post = requests.post(brewfatherCustomStreamURL, json = json)
+    print(post.text)
+  except Exception as err:
+    print("Failed to upload to BrewFather:\n%s" % err)
 
 def readsensors():
   readings = []
@@ -56,17 +56,16 @@ def readsensors():
   if gotData == 1:
     readings.append([str(time), "tiltSG", str(tiltSG)])
     readings.append([str(time), "tiltTempC", str(tiltTempC)])
-    #post to BrewFather API
+    
     tiltJSON = {
-      "name": "Tilt",
-      "temp": tiltTempC,
-      "gravity": tiltSG/1000,
-      "gravity_unit": "G",
-      "comment": "ID: " + tilt_id + ", Adjusted: " + tilt_sg_adjust
+    "name": "Tilt",
+    "temp": tiltTempC,
+    "gravity": tiltSG/1000,
+    "gravity_unit": "G",
+    "comment": "ID: " + tilt_id + ", Adjusted: " + tilt_sg_adjust
     }
-    post = requests.post(brewfatherCustomStreamURL, json = tiltJSON)
-    print(post.text)
-
+    postBrewfather(tiltJSON)
+  
   #read 1-wire thermometers
   #JSON to post to BrewFather API
   probes = {
@@ -85,9 +84,7 @@ def readsensors():
       probes["ext_temp"] = temp
     print(id+": "+str(temp))
     
-    #post to BrewFather API
-    post = requests.post(brewfatherCustomStreamURL, json = probes)
-    print(post.text)
+    postBrewfather(probes)
     readings.append([str(time), id, str(temp)])
 
   #tidy console output in blocks for each timestamp
