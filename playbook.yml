@@ -75,7 +75,7 @@
         - logFermentation/scrollit.service
 
     - name: Start services
-      systemd:
+      service:
         name: "{{ item }}"
         state: started
         enabled: yes
