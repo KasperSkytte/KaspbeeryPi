@@ -18,3 +18,4 @@ $run_dev.*
 ^token.rds$
 ^app\.R$
 ^rsconnect$
+^roles$

@@ -1,6 +1,6 @@
 ---
 - hosts:
-  - all
+  - kaspbeerypi
   become: yes
   vars:
     apt_pkgs:
@@ -20,7 +20,7 @@
         force_apt_get: "yes"
 
 - hosts:
-  - all
+  - kaspbeerypi
   become: yes
   vars:
     pip_install_packages:
@@ -47,13 +47,13 @@
         group: root
         mode: 0755
       with_items:
-        - blescan.py
-        - readsensors.py
-        - scrollit.py
+        - logFermentation/blescan.py
+        - logFermentation/readsensors.py
+        - logFermentation/scrollit.py
 
     - name: Copy variables file for python scripts
       template:
-        src: "files/vars.py.j2"
+        src: "logFermentation/vars.py.j2"
         dest: "/opt/logFermentation/vars.py"
         mode: 0755
 
