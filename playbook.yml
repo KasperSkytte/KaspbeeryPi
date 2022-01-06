@@ -39,9 +39,6 @@
   # roles:
   #   - geerlingguy.pip
   tasks:
-    - name: debug
-      debug:
-        msg: "{{ test }}"
     - name: Create /opt/logFermentation/ folder
       file:
         path: /opt/logFermentation/
