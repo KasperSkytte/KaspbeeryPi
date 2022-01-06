@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from w1thermsensor import W1ThermSensor
 import scrollphathd as sphd
 import sys
@@ -5,7 +6,7 @@ import time
 from subprocess import check_output
 import re
 
-def scroll_string(string, speed = 0.01):
+def scroll_string(string, speed = 0.001):
     string = str(string)
     sphd.clear()
     length = sphd.write_string(string)

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import blescan
 import vars
 import bluetooth._bluetooth as bluez

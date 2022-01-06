@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import print_function
 # BLE iBeaconScanner based on https://github.com/adamf/BLE/blob/master/ble-scanner.py
 # SwitchDoc Lab December 2020
