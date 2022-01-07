@@ -10,7 +10,7 @@ sudo apt-get install busybox-syslogd
 sudo apt-get remove --purge rsyslog
 sudo apt-get remove --purge logrotate triggerhappy samba-common #removing fake-hwclock and cron will mess up time sync
 sudo apt-get autoremove
-#add cafekapper.conf (client.ovpn file) to /etc/openvpn and credentials in auth.txt 
+#add cafekapper.conf (client.ovpn file) to /etc/openvpn and credentials in auth.txt, first line user, second password
 sudo systemctl restart openvpn
 sudo systemctl enable openvpn
 sudo curl -sL get.docker.com | bash
