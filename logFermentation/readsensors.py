@@ -63,7 +63,7 @@ def readsensors():
     "temp": tiltTempC,
     "gravity": tiltSG/1000,
     "gravity_unit": "G",
-    "comment": "ID: " + tilt_id + ", Adjusted: " + tilt_sg_adjust
+    "comment": "ID: " + vars.tilt_id + ", Adjusted: " + vars.tilt_sg_adjust
     }
     postBrewfather(tiltJSON)
   
