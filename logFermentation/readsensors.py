@@ -57,16 +57,16 @@ def readsensors():
   if gotData == 1:
     readings.append([str(time), "tiltSG", str(tiltSG)])
     readings.append([str(time), "tiltTempC", str(tiltTempC)])
-    
+
     tiltJSON = {
     "name": "Tilt",
     "temp": tiltTempC,
     "gravity": tiltSG/1000,
     "gravity_unit": "G",
-    "comment": "ID: " + vars.tilt_id + ", Adjusted: " + vars.tilt_sg_adjust
+    "comment": "ID: " + vars.tilt_id + ", Adjusted: " + str(vars.tilt_sg_adjust)
     }
     postBrewfather(tiltJSON)
-  
+
   #read 1-wire thermometers
   #JSON to post to BrewFather API
   probes = {
@@ -84,13 +84,13 @@ def readsensors():
     elif id == "Probe05":
       probes["ext_temp"] = temp
     print(id+": "+str(temp))
-    
+
     postBrewfather(probes)
     readings.append([str(time), id, str(temp)])
 
   #tidy console output in blocks for each timestamp
   print("-------------------------\n")
- 
+
   #write to local file
   with open(filepath, "a") as file:
     writer = csv.writer(file, quoting=csv.QUOTE_ALL)
@@ -104,7 +104,7 @@ def readsensors():
   except Exception as err:
     print("Failed to upload file to dropbox:\n%s" % err)
 
-# and then schedule to run with every chosen interval
+# Schedule to run with every chosen interval
 schedule.every(vars.read_interval).minutes.do(readsensors)
 
 try:
