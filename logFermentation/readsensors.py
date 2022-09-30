@@ -42,16 +42,26 @@ def readsensors():
         returnedList = blescan.parse_events(sock, 10)
         for beacon in returnedList: #returnedList is a list datatype of string datatypes seperated by commas (,)
           output = beacon.split(',') #split the list into individual strings in an array
-          if output[1] == vars.tilt_id: #Change this to the colour of your tilt
-            tempf = float(output[2]) #convert the string for the temperature to a float type
+          if output[1] == vars.tilt_id:
+            tempf = float(output[2])
             gotData = 1
-            tiltSG = int(output[3])+vars.tilt_sg_adjust
-            tiltTempC = round((tempf-32)/1.8, 3)
+            tiltSG = int(output[3])*float(vars.tilt_sg_slope)+float(vars.tilt_sg_offset)
+            tiltTempC = round((tempf-32)/1.8, 3)+float(vars.tilt_tempC_offset)
       blescan.hci_disable_le_scan(sock)
-      print("Tilt temp: "+str(tiltTempC)+"\nTilt SG: "+str(tiltSG))
+      print(
+        "Tilt tempC (offset: " +
+        str(vars.tilt_tempC_offset) +
+        "): " +
+        str(tiltTempC) +
+        "\nTilt SG (SG offset: " +
+        str(vars.tilt_sg_offset) +
+        ", SG slope: " +
+        str(vars.tilt_sg_slope) +
+        "): " +
+        str(tiltSG))
       pass
   except RuntimeError:
-    print("Could not connect to tilt for 20 seconds...")
+    print("Could not connect to Tilt for 20 seconds...")
   blescan.hci_disable_le_scan(sock)
 
   if gotData == 1:
@@ -63,7 +73,7 @@ def readsensors():
     "temp": tiltTempC,
     "gravity": tiltSG/1000,
     "gravity_unit": "G",
-    "comment": "ID: " + vars.tilt_id + ", Adjusted: " + str(vars.tilt_sg_adjust)
+    "comment": "ID: " + vars.tilt_id + " (SG offset: " + str(vars.tilt_sg_offset) + ", SG slope: " + str(vars.tilt_sg_slope) + ", tempC offset: " + str(vars.tilt_tempC_offset) + ")"
     }
     postBrewfather(tiltJSON)
 

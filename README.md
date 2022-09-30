@@ -22,6 +22,9 @@ Head to [DBX Platform](https://www.dropbox.com/developers) to create a Dropbox a
 ansible-playbook playbook.yml
 ```
 
+#### Tilt gravity calibration
+The Tilt gravity reading can be calibrated by a slope and offset. When changing battery the weight of the battery might be different and this is necessary. I did some tests when changing battery and figured out that it seems to be a linear model between the raw uncalibrated value and the adjusted value with hydrometer according to the Tilt android app. When changing battery it will automatically calibrate to 1000 if you place it in plain water immediately (if not adjust the `tilt_sg_offset` variable) after changing the battery, but the cal/uncal ratio/scale needs to be calibrated with a hydrometer. Make a few measurements, preferably with high gravity and dilute a few times. Plot the points of uncal+cal value from the Tilt app and check the trend. If linear just take the highest gravity reading with hydrometer and divide by its uncal tilt value to get the slope, in my case with a Duracell battery it was 1064/1042 = 1.021113, which is set with the `tilt_sg_slope` variable.
+
 ### Running the Shiny app for displaying the logged data
 Run the Shiny app by either hosting it on [https://shinyapps.io](https://shinyapps.io), run a Shiny server yourself through Docker with fx the [rocker/shiny](`https://hub.docker.com/r/rocker/shiny`) images, or just from within RStudio locally. The Shiny app is bundled as an R package using [`{golem}`](https://thinkr-open.github.io/golem/index.html), install with:
 
