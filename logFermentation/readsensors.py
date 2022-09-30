@@ -45,7 +45,7 @@ def readsensors():
           if output[1] == vars.tilt_id:
             tempf = float(output[2])
             gotData = 1
-            tiltSG = int(output[3])*float(vars.tilt_sg_slope)+float(vars.tilt_sg_offset)
+            tiltSG = round(int(output[3])*float(vars.tilt_sg_slope)+float(vars.tilt_sg_offset))
             tiltTempC = round((tempf-32)/1.8, 3)+float(vars.tilt_tempC_offset)
       blescan.hci_disable_le_scan(sock)
       print(
