@@ -69,11 +69,11 @@ def readsensors():
     readings.append([str(time), "tiltTempC", str(tiltTempC)])
 
     tiltJSON = {
-    "name": "Tilt",
-    "temp": tiltTempC,
-    "gravity": tiltSG/1000,
-    "gravity_unit": "G",
-    "comment": "ID: " + vars.tilt_id + " (SG offset: " + str(vars.tilt_sg_offset) + ", SG slope: " + str(vars.tilt_sg_slope) + ", tempC offset: " + str(vars.tilt_tempC_offset) + ")"
+      "name": "Tilt",
+      "temp": tiltTempC,
+      "gravity": tiltSG/1000,
+      "gravity_unit": "G",
+      "comment": "ID: " + vars.tilt_id + " (SG offset: " + str(vars.tilt_sg_offset) + ", SG slope: " + str(vars.tilt_sg_slope) + ", tempC offset: " + str(vars.tilt_tempC_offset) + ")"
     }
     postBrewfather(tiltJSON)
 

@@ -1,23 +1,33 @@
 #!/usr/bin/env python3
-from w1thermsensor import W1ThermSensor
 import scrollphathd as sphd
 import sys
 import time
-from subprocess import check_output
-import re
+import schedule
 
-def scroll_string(string, speed = 0.001):
-    string = str(string)
-    sphd.clear()
-    length = sphd.write_string(string)
-    sphd.write_string(string, brightness = 0.5)
+def scroll_string(
+  string = "hi",
+  speed = 0.001,
+  brightness = 0.3
+):
+  """Scroll a string on the phat display
+
+  Args:
+      string (str, optional): String to display. Defaults to "hi".
+      speed (float, optional): Speed of the scroll in seconds. Defaults to 0.001.
+      brightness
+  """
+  string = str(string)
+  sphd.clear()
+  length = sphd.write_string(string)
+  sphd.write_string(string, brightness = brightness)
+  sphd.show()
+  for str_pos in range(length):
+    sphd.scroll(1)
     sphd.show()
-    for str_pos in range(length):
-        sphd.scroll(1)
-        sphd.show()
-        time.sleep(speed)
+    time.sleep(speed)
 
-def CtrlC():
+def clearphat():
+  """Clears phat display and exits"""
   print("Stopping by keyboard interrupt...")
   sphd.clear()
   sphd.write_string("Bye", brightness = 0.5)
@@ -26,18 +36,29 @@ def CtrlC():
   sphd.clear()
   sys.exit(-1)
 
-try:
-  while True:
+if __name__ == "__main__":
+  from readtilt import readtilt
+  from read1wire import read1wire
+  import vars
+  try:
+    while True:
       string = str()
-      for sensor in W1ThermSensor.get_available_sensors():
-        try:
-          string = string+"    Probe%s: %.2f" % (sensor.id[0:2], sensor.get_temperature())
-        except:
-          string = string
-      try:
-        string = "     IP: "+re.search("[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*", str(check_output(['hostname', '-I']))).group()+string
-      except:
-        string = "     IP: N/A"+string
+      tiltSG, tiltTempC = readtilt(
+        tilt_id = vars.tilt_id,
+        bt_timeout = 20,
+        tilt_sg_slope = vars.tilt_sg_slope,
+        tilt_sg_offset = vars.tilt_sg_offset,
+        tilt_tempC_offset = vars.tilt_tempC_offset
+      )
+      if tiltSG == 0:
+        tiltSG = "N/A"
+      string = string + "     SG: " + str(tiltSG)
+      if tiltTempC == 0:
+        tiltTempC = "N/A"
+      string = string + "    TempC: " + str(tiltTempC)
+      for probe in read1wire():
+        string = string + "    " + probe[0] + ": " + probe[1]
+      print(string)
       scroll_string(string)
-except KeyboardInterrupt:
-  CtrlC()
+  except KeyboardInterrupt:
+    clearphat()
