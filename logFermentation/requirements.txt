@@ -1,0 +1,6 @@
+dropbox
+interruptingcow
+w1thermsensor
+pybluez
+scrollphathd
+schedule
