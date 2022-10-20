@@ -25,7 +25,7 @@
   - all
   become: yes
   vars_files:
-    - readsensors_vars.yml
+    - playbook_vars.yml
   vars:
     pip_package: python3-pip
     pip_executable: pip3
@@ -53,13 +53,13 @@
         group: root
         mode: 0755
       with_items:
-        - logFermentation/blescan.py
-        - logFermentation/readsensors.py
-        - logFermentation/scrollit.py
+        - blescan.py
+        - readsensors.py
+        - scrollit.py
 
     - name: Copy variables file for python scripts
       template:
-        src: "logFermentation/vars.py.j2"
+        src: "vars.py.j2"
         dest: "/opt/logFermentation/vars.py"
         mode: 0755
 
@@ -71,8 +71,8 @@
         group: root
         mode: 0755
       with_items:
-        - logFermentation/readsensors.service
-        - logFermentation/scrollit.service
+        - readsensors.service
+        - scrollit.service
 
     - name: Start services
       service:
