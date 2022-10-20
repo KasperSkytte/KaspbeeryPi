@@ -20,7 +20,7 @@ def readtilt(
       tilt_tempC_offset (int, optional): Add this value to the obtained temperature (celcius). Defaults to 0.
 
   Returns:
-      _type_: tiltSG, tiltTempC
+      float: tiltSG, tiltTempC
   """
   try:
     with timeout(bt_timeout, exception=RuntimeError):

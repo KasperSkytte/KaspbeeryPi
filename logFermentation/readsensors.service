@@ -1,10 +1,10 @@
 [Unit]
-Description=readsensors reads Tilt and DS18B20 probe readings and streams to DropBox
+Description=readsensors reads Tilt and DS18B20 probe readings and streams to DropBox and BrewFather
 
 [Service]
 User=root
 Group=root
-ExecStart=/opt/logFermentation/readsensors.py
+ExecStart=/opt/logFermentation/main.py
 
 [Install]
 WantedBy=multi-user.target
