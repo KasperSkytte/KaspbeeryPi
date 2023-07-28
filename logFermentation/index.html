@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fermentation Fridge Control</title>
+</head>
+<body>
+    <h1>Fermentation Fridge Control</h1>
+    <form action="/control" method="post">
+        Setpoint (Celsius): <input type="number" name="setpoint" step="0.1" value="{{ setpoint }}"><br>
+        KP (Proportional Gain): <input type="number" name="kp" step="0.1" value="{{ kp }}"><br>
+        KI (Integral Gain): <input type="number" name="ki" step="0.1" value="{{ ki }}"><br>
+        KD (Derivative Gain): <input type="number" name="kd" step="0.1" value="{{ kd }}"><br>
+        <input type="checkbox" name="autotune"> Autotune<br>
+        <input type="submit" value="Start">
+    </form>
+</body>
+</html>
