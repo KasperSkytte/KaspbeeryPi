@@ -8,6 +8,8 @@
       - bluez
       - libbluetooth-dev
       - python3-pip
+      - python3-virtualenv
+      - pipenv
       - libatlas-base-dev
   tasks:
     - name: "apt full-upgrade"
